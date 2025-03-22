@@ -81,6 +81,35 @@ app.get("/api/top-tracks", async (req, res) => {
     }
 });
 
+app.get("/api/top-artists", async (req, res) => {
+    if (!req.session.access_token) return res.redirect("/login");
+
+    try {
+        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/artists?limit=5`, {
+            headers: { Authorization: `Bearer ${req.session.access_token}` }
+        });
+
+        res.send(response.data.items.map(artist => artist.name));
+    } catch (error) {
+        res.send("Error fetching top artists");
+    }
+});
+
+app.get("/api/recently-played", async (req, res) => {
+    if (!req.session.access_token) return res.redirect("/login");
+
+    try {
+        console.log("r")
+        const response = await axios.get(`${SPOTIFY_API_URL}/me/player/recently-played?limit=10`, {
+            headers: { Authorization: `Bearer ${req.session.access_token}` }
+        });
+        
+        console.log(response)
+        res.send(response.data.items.map(track => track.track.name));
+    } catch (error) {
+        res.send("Error fetching recently played tracks");
+    }
+});
 app.get('/api/user', async (req, res) => {
     if (!req.session.access_token) {
         return res.status(401).json({ error: "Not logged in" });
@@ -90,7 +119,7 @@ app.get('/api/user', async (req, res) => {
         const response = await axios.get("https://api.spotify.com/v1/me", {
             headers: { Authorization: `Bearer ${req.session.access_token}` }
         });
-        console.log(response)
+        // console.log(response)
         res.json(response.data);
     } catch (error) {
         console.error("Error fetching user data:", error);
