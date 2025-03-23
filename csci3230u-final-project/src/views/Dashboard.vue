@@ -14,7 +14,6 @@
       <ul>
         <li v-for="track in recentlyPlayed" :key="track">{{ track }}</li>
       </ul>
-      <!-- ^ doesn't work yet -->
       <button @click="logout">Logout</button>
     </div>
   </template>
