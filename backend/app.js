@@ -33,7 +33,7 @@ app.get("/api/login", (req, res) => {
         client_id: process.env.SPOTIFY_CLIENT_ID,
         response_type: "code",
         redirect_uri: process.env.SPOTIFY_REDIRECT_URI, 
-        scope: "user-top-read"
+        scope: "user-top-read user-read-recently-played" 
     });
 
     res.redirect(`${SPOTIFY_AUTH_URL}?${params}`);
@@ -75,7 +75,17 @@ app.get("/api/top-tracks", async (req, res) => {
             headers: { Authorization: `Bearer ${req.session.access_token}` }
         });
 
-        res.send(response.data.items.map(track => track.name));
+        // console.log(response.data.items)
+        const tracks = response.data.items.map(track => ({
+            name: track.name, 
+            album: track.album.name, 
+            artist: track.artists.map(artist => artist.name).join(", "), 
+            image: track.album.images[0]?.url,
+            duration_ms: track.duration_ms 
+        }));
+        const totalListeningTimeMs = tracks.reduce((sum, track) => sum + track.duration_ms, 0);
+        const totalListeningTimeMinutes = (totalListeningTimeMs / 60000).toFixed(2);
+        res.json({tracks, totalListeningTimeMinutes})
     } catch (error) {
         res.send("Error fetching top tracks");
     }
@@ -89,7 +99,13 @@ app.get("/api/top-artists", async (req, res) => {
             headers: { Authorization: `Bearer ${req.session.access_token}` }
         });
 
-        res.send(response.data.items.map(artist => artist.name));
+        const artists = response.data.items.map(artist => ({
+            name: artist.name, 
+            genres: artist.genres.join(", "), 
+            image: artist.images[0]?.url 
+        }));
+
+        res.json(artists);
     } catch (error) {
         res.send("Error fetching top artists");
     }
@@ -99,13 +115,18 @@ app.get("/api/recently-played", async (req, res) => {
     if (!req.session.access_token) return res.redirect("/login");
 
     try {
-        console.log("r")
-        const response = await axios.get(`${SPOTIFY_API_URL}/me/player/recently-played?limit=10`, {
+        const response = await axios.get(`${SPOTIFY_API_URL}/me/player/recently-played?limit=5`, {
             headers: { Authorization: `Bearer ${req.session.access_token}` }
         });
         
-        console.log(response)
-        res.send(response.data.items.map(track => track.track.name));
+        console.log(response.data.items)
+        const tracks = response.data.items.map(track => ({
+            name: track.track.name,
+            album: track.track.album.name, 
+            artist: track.track.artists.map(artist => artist.name).join(", "), 
+            image: track.track.album.images[0]?.url 
+        }));
+        res.json(tracks);
     } catch (error) {
         res.send("Error fetching recently played tracks");
     }
