@@ -83,7 +83,7 @@ app.get("/api/top-tracks", async (req, res) => {
             image: track.album.images[0]?.url,
             duration_ms: track.duration_ms 
         }));
-        const totalListeningTimeMs = tracks.reduce((sum, track) => sum + track.duration_ms, 0);
+        const totalListeningTimeMs = tracks.reduce((sum, track) => sum + track.duration_ms, 0); // total time played
         const totalListeningTimeMinutes = (totalListeningTimeMs / 60000).toFixed(2);
         res.json({tracks, totalListeningTimeMinutes})
     } catch (error) {
@@ -91,11 +91,12 @@ app.get("/api/top-tracks", async (req, res) => {
     }
 });
 
+// Can get top generes here
 app.get("/api/top-artists", async (req, res) => {
     if (!req.session.access_token) return res.redirect("/login");
 
     try {
-        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/artists?limit=5`, {
+        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/artists?limit=10`, {
             headers: { Authorization: `Bearer ${req.session.access_token}` }
         });
 
@@ -145,6 +146,33 @@ app.get('/api/user', async (req, res) => {
     } catch (error) {
         console.error("Error fetching user data:", error);
         res.status(500).json({ error: "Failed to fetch user data" });
+    }
+});
+
+// you can search for albums, artists, tracks etc. 
+// MUST SPECIFY TYPE: "album", "artist", "playlist", "track", "show", "episode", "audiobook"
+app.get("/api/search", async (req, res) => {
+    if (!req.session.access_token) return res.redirect("/api/login");
+
+    const { query, type } = req.query;
+    if (!query || !type) {
+        return res.status(400).json({ error: "Query and type are required" });
+    }
+
+    try {
+        const response = await axios.get(`${SPOTIFY_API_URL}/search`, {
+            headers: { Authorization: `Bearer ${req.session.access_token}` },
+            params: {
+                q: query,
+                type: type,
+                limit: 10
+            }
+        });
+
+        res.json(response.data);
+    } catch (error) {
+        console.error("Error searching Spotify:", error);
+        res.status(500).send("Error performing search");
     }
 });
 
