@@ -1,4 +1,3 @@
-// Taken from lecture 20 for now
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
