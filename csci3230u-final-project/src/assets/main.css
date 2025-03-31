@@ -3,7 +3,7 @@
 a,
 .green {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
+  color: rgb(255, 162, 162);
   transition: 0.4s;
   padding: 3px;
 }

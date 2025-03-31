@@ -7,6 +7,7 @@ import { RouterLink, RouterView } from "vue-router";
     <nav>
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/dashboard">Dashboard</RouterLink>
+      <RouterLink to="/top-songs">Top Songs</RouterLink>
       <RouterLink to="/about">About</RouterLink>
     </nav>
   </header>
@@ -17,7 +18,7 @@ import { RouterLink, RouterView } from "vue-router";
 
 <style scoped>
 header {
-  background-color: cornflowerblue;
+  background-color: rgb(46, 53, 67);
   line-height: 1.5;
   display: flex;
   place-items: center;
