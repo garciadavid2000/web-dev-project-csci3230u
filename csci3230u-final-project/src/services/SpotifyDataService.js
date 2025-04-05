@@ -19,25 +19,23 @@ const apiClient = axios.create({
 // Main value that will be exported when this file is imported elsewhere.
 // This is an Object that contains our method getUserEndpoint.
 // Any module that imports this file using the default import syntax will get this object.
+
 export default {
+  
   // Export method to get user data
   getUserEndpoint() {
-    // Added onto baseURL
     return apiClient.get('/user')
   },
   
   getTopTracksEndpoint() {
-    // Added onto baseURL
     return apiClient.get('/top-tracks')
   },
 
-  getTopArtistsEndpoints() {
-    // Added onto baseURL
+  getTopArtistsEndpoint() {
     return apiClient.get('/top-artists')
   },
 
   getRecentlyPlayedTracksEndpoint() {
-    // Added onto baseURL
     return apiClient.get('/recently-played')
   },
 
