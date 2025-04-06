@@ -69,10 +69,12 @@ app.get("/api/callback", async (req, res) => {
 
 app.get("/api/top-tracks", async (req, res) => {
     if (!req.session.access_token) return res.redirect("/login");
+    const { limit = 5, time_range = 'medium_term' } = req.query; //default values if not specified
 
     try {
-        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/tracks?limit=5`, {
-            headers: { Authorization: `Bearer ${req.session.access_token}` }
+        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/tracks`, {
+            headers: { Authorization: `Bearer ${req.session.access_token}` },
+            params: { limit, time_range }
         });
 
         // console.log(response.data.items)
@@ -94,10 +96,12 @@ app.get("/api/top-tracks", async (req, res) => {
 // Can get top generes here
 app.get("/api/top-artists", async (req, res) => {
     if (!req.session.access_token) return res.redirect("/login");
-
+    const { limit = 5, time_range = 'medium_term' } = req.query; //default values if not specified
+    
     try {
-        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/artists?limit=10`, {
-            headers: { Authorization: `Bearer ${req.session.access_token}` }
+        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/artists`, {
+            headers: { Authorization: `Bearer ${req.session.access_token}` },
+            params: { limit, time_range }
         });
 
         const artists = response.data.items.map(artist => ({
