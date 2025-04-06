@@ -46,7 +46,13 @@ export default {
         type: 'track'
       }
     });
+  },
+
+  getTrackById(id) {
+    return apiClient.get(`/track/${id}`);
+  },
+
+  getArtistById(id) {
+    return apiClient.get(`/artist/${id}`);
   }
-
-
 }
