@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import TopSongsView from '@/views/TopSongsView.vue'
 import BrowseView from '@/views/BrowseView.vue';
+import SongDetailView from '@/views/SongDetailView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,12 @@ const router = createRouter({
       path: '/browse', 
       name: 'Browse', 
       component: BrowseView
+    },
+    { 
+      path: '/song/:id', 
+      name: 'SongDetail', 
+      component: SongDetailView, 
+      props: true 
     }
   ],
 })
