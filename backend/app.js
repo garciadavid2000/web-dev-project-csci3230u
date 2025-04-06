@@ -70,7 +70,7 @@ app.get("/api/callback", async (req, res) => {
 app.get("/api/top-tracks", async (req, res) => {
     if (!req.session.access_token) return res.redirect("/login");
     const { limit = 5, time_range = 'medium_term' } = req.query; //default values if not specified
-
+    // NOTE: acceptable time_ranges for the API are: long_term (About a year), medium_term (6 months) and short_term(1 month)
     try {
         const response = await axios.get(`${SPOTIFY_API_URL}/me/top/tracks`, {
             headers: { Authorization: `Bearer ${req.session.access_token}` },
