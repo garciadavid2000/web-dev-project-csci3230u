@@ -39,5 +39,14 @@ export default {
     return apiClient.get('/recently-played')
   },
 
+  searchTracksEndpoint(query) {
+    return apiClient.get('/search', {
+      params: {
+        query: query,
+        type: 'track'
+      }
+    });
+  }
+
 
 }
