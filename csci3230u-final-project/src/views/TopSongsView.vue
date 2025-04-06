@@ -1,27 +1,22 @@
 <script setup>
 // @ is an alias for src, making this an absolute path
 import SongCard from '@/components/SongCard.vue';
+import { useSpotifyDataStore } from '@/stores/spotifyData';
+import { storeToRefs } from 'pinia';
 import { ref, onMounted } from 'vue';
-import SpotifyDataService from '@/services/SpotifyDataService.js';
 
-const songsData = ref(null);
+const spotifyDataStore = useSpotifyDataStore();
+const { topTracks } = storeToRefs(spotifyDataStore);
 
-onMounted(() => {
-    SpotifyDataService.getTopTracksEndpoint()
-    .then((response) => {
-      // Return the data from the response
-      songsData.value = response.data;
-    }
-    ).catch((error) => {
-      console.error('Error fetching top tracks:', error);
-    });
+onMounted(async () => {
+  await spotifyDataStore.getTopTracks(); // make sure the data has loaded
 })
 
 </script>
 
 
 <template>
-    <div v-if="songsData">
-        <SongCard v-for="song in songsData.tracks" :key="song.name" :cardProp="song" />
+    <div v-if="topTracks">
+        <SongCard v-for="song in topTracks.tracks" :key="song.name" :cardProp="song" />
     </div>
 </template>
