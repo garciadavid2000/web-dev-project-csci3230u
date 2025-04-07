@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 import SpotifyDataService from '@/services/SpotifyDataService'
 
 export const useSpotifyDataStore = defineStore('spotifyData', () => {
-  const userData = ref(null);
   const topTracks = ref(null);
   const topArtists = ref(null);
   const recentlyPlayedTracks = ref(null);
@@ -13,7 +12,7 @@ export const useSpotifyDataStore = defineStore('spotifyData', () => {
   // const doubleCount = computed(() => count.value * 2) 
   
   async function getTopTracks(limit = 5, time_range = 'short_term') {
-    if (topTracks.value === null) {
+    if (topTracks.value === null || topTracks.value.length !== limit) {
       isLoading.value = true;
       try {
         const response = await SpotifyDataService.getTopTracksEndpoint(limit, time_range);
@@ -27,7 +26,7 @@ export const useSpotifyDataStore = defineStore('spotifyData', () => {
   }
 
   async function getTopArtists(limit = 5, time_range = 'short_term') {
-    if (topArtists.value === null) {
+    if (topArtists.value === null || topArtists.value.length !== limit) {
       isLoading.value = true;
       try {
         const response = await SpotifyDataService.getTopArtistsEndpoint(limit, time_range);
@@ -54,14 +53,27 @@ export const useSpotifyDataStore = defineStore('spotifyData', () => {
     }
   }
 
+  async function getUserData() {
+    if (userData.value === null) {
+      isLoading.value = true;
+      try {
+        const response = await SpotifyDataService.getUserEndpoint();
+        userData.value = response.data;
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        isLoading.value = false;
+      }
+    }
+  }
+
   return { 
-    userData, 
     topTracks, 
     topArtists, 
     recentlyPlayedTracks, 
     isLoading, 
     getTopTracks, 
     getTopArtists, 
-    getRecentlyPlayedTracks 
+    getRecentlyPlayedTracks
   }
 })
