@@ -12,7 +12,7 @@ const isShrunk = ref(false);
 function search() {
   isShrunk.value = true;
   if (!searchQuery.value) return;
-  SpotifyDataService.searchTracksEndpoint(searchQuery.value)
+  SpotifyDataService.searchTracksEndpoint(searchQuery.value, 'track')
     .then(response => {
       results.value = response.data;
     })
