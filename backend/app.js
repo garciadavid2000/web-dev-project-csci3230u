@@ -180,6 +180,34 @@ app.get("/api/search", async (req, res) => {
     }
 });
 
+//get song information by track id
+app.get('/api/track/:id', async (req, res) => {
+    const trackId = req.params.id;
+    try {
+      const response = await axios.get(`${SPOTIFY_API_URL}/tracks/${trackId}`, {
+        headers: { Authorization: `Bearer ${req.session.access_token}` }
+      });
+      res.json(response.data);
+    } catch (error) {
+      console.error('Error fetching track by ID:', error);
+      res.status(500).json({ error: 'Failed to fetch track details' });
+    }
+});
+
+//get artist information by artist id
+app.get('/api/artist/:id', async (req, res) => {
+    const artistId = req.params.id;
+    try {
+      const response = await axios.get(`${SPOTIFY_API_URL}/artists/${artistId}`, {
+        headers: { Authorization: `Bearer ${req.session.access_token}` }
+      });
+      res.json(response.data);
+    } catch (error) {
+      console.error('Error fetching artist by ID:', error);
+      res.status(500).json({ error: 'Failed to fetch artist details' });
+    }
+});
+
 app.use((err, req, res, next) => {
     res.status(err.status || 500).json({
         message: err.message || "Internal Server Error",

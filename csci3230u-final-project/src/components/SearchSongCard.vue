@@ -1,20 +1,33 @@
 <script setup>
-defineProps({
+import { useRouter } from 'vue-router'
+
+const { cardProp } = defineProps({
   cardProp: {
     type: Object,
     required: true,
   },
 });
 
+const router = useRouter()
+
 const formatDuration = (durationMs) => {
     const minutes = Math.floor(durationMs/60000);
     const seconds = Math.floor((durationMs%60000)/1000);
     return `${minutes}:${seconds<10?'0'+seconds:seconds}`;
 };
+
+const goToDetail = () => {
+  router.push({ 
+    name: 'SongDetail', 
+    params: { id: cardProp.id }, 
+    state: { songData: cardProp }  // optional if you want to pass whole object
+  })
+}
+
 </script>
 
 <template>
-    <div class="card">
+    <div class="card" @click="goToDetail">
         <div class="album-art">
             <img :src="cardProp.album.images[0]?.url" alt="Album Art" />
         </div>
