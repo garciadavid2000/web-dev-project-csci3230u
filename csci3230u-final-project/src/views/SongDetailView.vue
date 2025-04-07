@@ -8,18 +8,20 @@ import SearchArtistCard from '@/components/SearchArtistCard.vue'
 const route = useRoute()
 const songId = route.params.id
 const track = ref(null)
-const artist = ref(null)
+const artists = ref([])
 
 onMounted(async () => {
   try {
-    // Fetch track details
+
     const response = await SpotifyDataService.getTrackById(songId)
     track.value = response.data
 
-    // Fetch details for the first artist in the track
-    const artistId = track.value.artists[0].id
-    const artistResponse = await SpotifyDataService.getArtistById(artistId)
-    artist.value = artistResponse.data
+    if (track.value && track.value.artists) {
+      const artistIds = track.value.artists.map(a => a.id)
+      const artistPromises = artistIds.map(id => SpotifyDataService.getArtistById(id))
+      const artistResponses = await Promise.all(artistPromises)
+      artists.value = artistResponses.map(resp => resp.data)
+    }
   } catch (error) {
     console.error("Error loading track or artist details:", error)
   }
@@ -35,19 +37,25 @@ const formatDuration = (durationMs) => {
 <template>
   <div class="detail-wrapper">
     <div class="detail-card">
-      <div class="track-section">
-        <img :src="track?.album?.images[0]?.url" alt="Track Cover" class="track-image" />
-        <h2 class="track-name">{{ track?.name }}</h2>
-        <p class="track-meta">Duration: {{ formatDuration(track?.duration_ms) }}</p>
-      </div>
-      <div class="cards-column">
-        <div class="album-card-section" v-if="track && track.album">
-          Album:
+      <div class="main-column">
+        <div class="track-section">
+          <img :src="track?.album?.images[0]?.url" alt="Track Cover" class="track-image" />
+          <h2 class="track-name">{{ track?.name }}</h2>
+          <p class="track-meta">Duration: {{ formatDuration(track?.duration_ms) }}</p>
+        </div>
+        <div class="album-section" v-if="track && track.album">
           <SearchSongCard :cardProp="track.album" cardType="album" />
         </div>
-        <div class="artist-card-section" v-if="artist">
-          Artist:
-          <SearchArtistCard :cardProp="artist" cardType="artist" />
+      </div>
+      <div class="artists-column" v-if="artists.length">
+        <h3>Artists</h3>
+        <div class="artists-list">
+          <SearchArtistCard
+            v-for="artist in artists"
+            :key="artist.id"
+            :cardProp="artist"
+            cardType="artist"
+          />
         </div>
       </div>
     </div>
@@ -69,14 +77,19 @@ const formatDuration = (durationMs) => {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
+.main-column {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border-right: 2px solid #444;
+}
 
 .track-section {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px;
-  border-right: 2px solid #444;
 }
 .track-image {
   width: 250px;
@@ -99,19 +112,32 @@ const formatDuration = (durationMs) => {
   text-align: center;
 }
 
-.cards-column {
+.album-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.album-section h3 {
+  color: #ffa500;
+}
+
+.artists-column {
   flex: 1;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 24px;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
-.album-card-section,
-.artist-card-section {
-  width: 100%;
+.artists-column h3 {
+  color: #ffa500;
+  margin-bottom: 12px;
+}
+.artists-list {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
 }
 </style>

@@ -10,27 +10,25 @@ const albumId = route.params.id
 
 const album = ref(null)
 const albumTracks = ref([])
-const albumArtist = ref(null)
+const albumArtists = ref([])
 
 onMounted(async () => {
   try {
-    // Fetch album details
     const albumResponse = await SpotifyDataService.getAlbumById(albumId)
     album.value = albumResponse.data
 
-    // Fetch album tracks using the new endpoint
     const tracksResponse = await SpotifyDataService.getAlbumTracks(albumId)
-    // Map each track so it includes the album info (needed for the song card)
     albumTracks.value = tracksResponse.data.items.map(track => ({
       ...track,
       album: album.value
     }))
 
-    // Optionally, fetch details for the album's primary artist
     if (album.value.artists && album.value.artists.length > 0) {
-      const artistId = album.value.artists[0].id
-      const artistResponse = await SpotifyDataService.getArtistById(artistId)
-      albumArtist.value = artistResponse.data
+      const artistPromises = album.value.artists.map(artist =>
+        SpotifyDataService.getArtistById(artist.id)
+      )
+      const artistResponses = await Promise.all(artistPromises)
+      albumArtists.value = artistResponses.map(resp => resp.data)
     }
   } catch (error) {
     console.error("Error loading album details or tracks:", error)
@@ -45,8 +43,16 @@ onMounted(async () => {
         <img :src="album?.images[0]?.url" alt="Album Cover" class="album-image" />
         <h2 class="album-name">{{ album?.name }}</h2>
         <p class="album-meta">Released: {{ album?.release_date }}</p>
-        <div v-if="albumArtist" class="artist-card-wrapper">
-          <SearchArtistCard :cardProp="albumArtist" cardType="artist" />
+        <div v-if="albumArtists.length" class="artist-cards-wrapper">
+          <h3>Artists</h3>
+          <div class="artist-cards-list">
+            <SearchArtistCard
+              v-for="artist in albumArtists"
+              :key="artist.id"
+              :cardProp="artist"
+              cardType="artist"
+            />
+          </div>
         </div>
       </div>
       <div class="tracks-section">
@@ -70,6 +76,7 @@ onMounted(async () => {
   margin: 30px auto;
   padding: 20px;
 }
+
 .detail-card {
   display: flex;
   background-color: #2d2d2d;
@@ -77,6 +84,7 @@ onMounted(async () => {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
+
 .album-section {
   flex: 1;
   padding: 24px;
@@ -105,10 +113,16 @@ onMounted(async () => {
   margin-top: 8px;
   text-align: center;
 }
-.artist-card-wrapper {
+.artist-cards-wrapper {
   margin-top: 20px;
   width: 100%;
 }
+.artist-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .tracks-section {
   flex: 1;
   padding: 24px;
