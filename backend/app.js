@@ -69,10 +69,12 @@ app.get("/api/callback", async (req, res) => {
 
 app.get("/api/top-tracks", async (req, res) => {
     if (!req.session.access_token) return res.redirect("/login");
-
+    const { limit = 5, time_range = 'medium_term' } = req.query; //default values if not specified
+    // NOTE: acceptable time_ranges for the API are: long_term (About a year), medium_term (6 months) and short_term(1 month)
     try {
-        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/tracks?limit=5`, {
-            headers: { Authorization: `Bearer ${req.session.access_token}` }
+        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/tracks`, {
+            headers: { Authorization: `Bearer ${req.session.access_token}` },
+            params: { limit, time_range }
         });
 
         // console.log(response.data.items)
@@ -94,10 +96,12 @@ app.get("/api/top-tracks", async (req, res) => {
 // Can get top generes here
 app.get("/api/top-artists", async (req, res) => {
     if (!req.session.access_token) return res.redirect("/login");
-
+    const { limit = 5, time_range = 'medium_term' } = req.query; //default values if not specified
+    
     try {
-        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/artists?limit=10`, {
-            headers: { Authorization: `Bearer ${req.session.access_token}` }
+        const response = await axios.get(`${SPOTIFY_API_URL}/me/top/artists`, {
+            headers: { Authorization: `Bearer ${req.session.access_token}` },
+            params: { limit, time_range }
         });
 
         const artists = response.data.items.map(artist => ({
@@ -176,6 +180,34 @@ app.get("/api/search", async (req, res) => {
     }
 });
 
+//get song information by track id
+app.get('/api/track/:id', async (req, res) => {
+    const trackId = req.params.id;
+    try {
+      const response = await axios.get(`${SPOTIFY_API_URL}/tracks/${trackId}`, {
+        headers: { Authorization: `Bearer ${req.session.access_token}` }
+      });
+      res.json(response.data);
+    } catch (error) {
+      console.error('Error fetching track by ID:', error);
+      res.status(500).json({ error: 'Failed to fetch track details' });
+    }
+});
+
+//get artist information by artist id
+app.get('/api/artist/:id', async (req, res) => {
+    const artistId = req.params.id;
+    try {
+      const response = await axios.get(`${SPOTIFY_API_URL}/artists/${artistId}`, {
+        headers: { Authorization: `Bearer ${req.session.access_token}` }
+      });
+      res.json(response.data);
+    } catch (error) {
+      console.error('Error fetching artist by ID:', error);
+      res.status(500).json({ error: 'Failed to fetch artist details' });
+    }
+});
+
 app.use((err, req, res, next) => {
     res.status(err.status || 500).json({
         message: err.message || "Internal Server Error",
@@ -192,6 +224,70 @@ app.get('/api/logout', (req, res) => {
     });
 });
 
+app.get('/api/artist/:id/top-tracks', async (req, res) => {
+    const artistId = req.params.id;
+    // The market parameter is required by Spotify's API I left as US by default
+    const market = req.query.market || 'US';
+    try {
+      const response = await axios.get(`${SPOTIFY_API_URL}/artists/${artistId}/top-tracks`, {
+        headers: { Authorization: `Bearer ${req.session.access_token}` },
+        params: { market }
+      });
+      // Return the complete data, or process it if needed
+      res.json(response.data);
+    } catch (error) {
+      console.error("Error fetching artist top tracks:", error.response ? error.response.data : error);
+      res.status(500).json({ error: 'Failed to fetch artist top tracks' });
+    }
+});
+
+app.get('/api/album/:id', async (req, res) => {
+    const albumId = req.params.id;
+    try {
+      const response = await axios.get(`${SPOTIFY_API_URL}/albums/${albumId}`, {
+        headers: { Authorization: `Bearer ${req.session.access_token}` }
+      });
+      res.json(response.data);
+    } catch (error) {
+      console.error('Error fetching album by ID:', error.response ? error.response.data : error);
+      res.status(500).json({ error: 'Failed to fetch album details' });
+    }
+});
+
+app.get('/api/album/:id/tracks', async (req, res) => {
+    const albumId = req.params.id;
+    const { limit = 20, offset = 0, market = 'US' } = req.query;
+    try {
+      const response = await axios.get(`${SPOTIFY_API_URL}/albums/${albumId}/tracks`, {
+        headers: { Authorization: `Bearer ${req.session.access_token}` },
+        params: { limit, offset, market }
+      });
+      res.json(response.data);
+    } catch (error) {
+      console.error('Error fetching album tracks:', error.response ? error.response.data : error);
+      res.status(500).json({ error: 'Failed to fetch album tracks' });
+    }
+  });
+
+  app.get('/api/artist/:id/albums', async (req, res) => {
+    const artistId = req.params.id;
+    // You can also accept query parameters for limit, market, and include_groups
+    const { limit = 5, market = 'US', include_groups = 'album' } = req.query;
+    
+    try {
+      const response = await axios.get(`${SPOTIFY_API_URL}/artists/${artistId}/albums`, {
+        headers: { Authorization: `Bearer ${req.session.access_token}` },
+        params: { limit, market, include_groups }
+      });
+      res.json(response.data);
+    } catch (error) {
+      console.error('Error fetching artist albums:', error.response ? error.response.data : error);
+      res.status(500).json({ error: 'Failed to fetch artist albums' });
+    }
+  });
+  
+
 app.listen(process.env.PORT || port, () => {
     console.log(`App is listening on port: ${port}, http://localhost:${port}`)
 });
+
