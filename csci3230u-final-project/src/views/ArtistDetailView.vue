@@ -11,9 +11,9 @@ const artist = ref(null)
 const topTracks = ref([])
 const recentAlbums = ref([])
 
-onMounted(async () => {
+onMounted(async () => {//Had to comment this because it kept getting too complicated
   try {
-    // Fetch artist details
+
     const artistResponse = await SpotifyDataService.getArtistById(artistId)
     artist.value = artistResponse.data
 
@@ -24,7 +24,7 @@ onMounted(async () => {
 
     // Fetch the artist's albums (recent ones)
     const albumsResponse = await SpotifyDataService.getArtistAlbums(artistId)
-    // Optionally sort by release_date descending if needed
+    // sort by release_date descending if needed
     recentAlbums.value = albumsResponse.data.items.sort((a, b) => {
       // Compare release_date strings; adjust parsing as needed if precision is not 'day'
       return new Date(b.release_date) - new Date(a.release_date)
@@ -39,15 +39,12 @@ onMounted(async () => {
 <template>
   <div class="detail-wrapper">
     <div class="detail-card">
-      <!-- Artist Info Section -->
       <div class="artist-info-section">
         <img :src="artist?.images?.[0]?.url" alt="Artist Image" class="artist-image" />
         <h2 class="artist-name">{{ artist?.name }}</h2>
         <p class="artist-meta">Followers: {{ artist?.followers?.total?.toLocaleString() }}</p>
       </div>
-      <!-- Content Columns Section -->
       <div class="columns-section">
-        <!-- Top Tracks Column -->
         <div class="tracks-column">
           <h2>Top 5 Tracks</h2>
           <div class="tracks-list">
@@ -59,7 +56,6 @@ onMounted(async () => {
             />
           </div>
         </div>
-        <!-- Recent Albums Column -->
         <div class="albums-column">
           <h2>Recent Albums</h2>
           <div class="albums-list">
@@ -91,7 +87,6 @@ onMounted(async () => {
   padding: 24px;
 }
 
-/* Artist Info Section */
 .artist-info-section {
   display: flex;
   flex-direction: column;
@@ -121,14 +116,12 @@ onMounted(async () => {
   text-align: center;
 }
 
-/* Columns Section */
 .columns-section {
   display: flex;
   gap: 20px;
   justify-content: space-evenly;
 }
 
-/* Tracks Column */
 .tracks-column {
   flex: 1;
   display: flex;
@@ -146,7 +139,6 @@ onMounted(async () => {
   width: 100%;
 }
 
-/* Albums Column */
 .albums-column {
   flex: 1;
   display: flex;
