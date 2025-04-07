@@ -1,32 +1,28 @@
 <script setup>
 defineProps({
-  cardProp: {
+  artistProp: {
     type: Object,
     required: true,
   },
-  cardType: {
-    type: String,
-    required: true,
-  }
 });
 </script>
 
 <template>
-    <div class="card">
-      <img :src="cardProp.image" alt="Album Art" />
-      <div class="container">
-        <h4><b>{{ cardProp.name }}</b></h4>
-        <p>{{ cardProp.artist }}</p>
-        <p>{{ cardProp.album }}</p>
-      </div>
+  <div class="card">
+    <!-- Use the first image from the images array -->
+    <img :src="artistProp.images[0]?.url" alt="Artist Image" />
+    <div class="container">
+      <h4><b>{{ artistProp.name }}</b></h4>
+      <!-- Access followers.total for the count -->
+      <p>{{ artistProp.followers.total.toLocaleString() }} followers</p>
     </div>
+  </div>
 </template>
 
 <style scoped>
 .card {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   transition: 0.3s;
-  width: 40%;
   margin: 10px;
   display: inline-block;
 }
@@ -42,5 +38,4 @@ defineProps({
 img {
   width: 10%;
 }
-
 </style>

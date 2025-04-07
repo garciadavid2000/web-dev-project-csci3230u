@@ -39,7 +39,7 @@ export default {
     return apiClient.get('/recently-played')
   },
 
-  searchTracksEndpoint(query, type) {
+  searchTracksEndpoint(query,type) {
     return apiClient.get('/search', {
       params: {
         query: query,
@@ -54,5 +54,27 @@ export default {
 
   getArtistById(id) {
     return apiClient.get(`/artist/${id}`);
+  },
+
+  getArtistTopTracks(id) {
+    return apiClient.get(`/artist/${id}/top-tracks`);
+  },
+
+  getAlbumById(id) {
+    return apiClient.get(`/album/${id}`);
+  },
+  
+  getAlbumTracks(id, limit = 20, offset = 0, market = 'US') {
+    return apiClient.get(`/album/${id}/tracks`, {
+      params: { limit, offset, market }
+    });
+  },
+
+  getArtistAlbums(id, limit = 5, market = 'US') {
+    return apiClient.get(`/artist/${id}/albums`, {
+      params: { include_groups: 'album', limit, market }
+    });
   }
+  
+
 }
