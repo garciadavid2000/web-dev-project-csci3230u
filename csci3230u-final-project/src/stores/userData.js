@@ -2,8 +2,9 @@ import { ref, /* computed */ } from 'vue'
 import { defineStore } from 'pinia'
 import SpotifyDataService from '@/services/SpotifyDataService'
 
-export const useSpotifyDataStore = defineStore('spotifyData', () => {
+export const useUserDataStore = defineStore('userData', () => {
   const userData = ref(null);
+  const isLoading = ref(false);
 
   async function getUserData() {
     if (userData.value === null) {
