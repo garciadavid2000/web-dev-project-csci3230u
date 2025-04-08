@@ -68,7 +68,7 @@ app.get("/api/callback", async (req, res) => {
 });
 
 app.get("/api/top-tracks", async (req, res) => {
-    if (!req.session.access_token) return res.redirect("/login");
+    if (!req.session.access_token) return res.status(401).json({ message: 'Not authenticated' });
     const { limit = 5, time_range = 'medium_term' } = req.query; //default values if not specified
     // NOTE: acceptable time_ranges for the API are: long_term (About a year), medium_term (6 months) and short_term(1 month)
     try {
@@ -95,7 +95,7 @@ app.get("/api/top-tracks", async (req, res) => {
 
 // Can get top generes here
 app.get("/api/top-artists", async (req, res) => {
-    if (!req.session.access_token) return res.redirect("/login");
+    if (!req.session.access_token) return res.status(401).json({ message: 'Not authenticated' });
     const { limit = 5, time_range = 'medium_term' } = req.query; //default values if not specified
     
     try {
@@ -117,7 +117,7 @@ app.get("/api/top-artists", async (req, res) => {
 });
 
 app.get("/api/recently-played", async (req, res) => {
-    if (!req.session.access_token) return res.redirect("/login");
+    if (!req.session.access_token) return res.status(401).json({ message: 'Not authenticated' });
 
     try {
         const response = await axios.get(`${SPOTIFY_API_URL}/me/player/recently-played?limit=5`, {
@@ -156,7 +156,7 @@ app.get('/api/user', async (req, res) => {
 // you can search for albums, artists, tracks etc. 
 // MUST SPECIFY TYPE: "album", "artist", "playlist", "track", "show", "episode", "audiobook"
 app.get("/api/search", async (req, res) => {
-    if (!req.session.access_token) return res.redirect("/api/login");
+    if (!req.session.access_token) return res.status(401).json({ message: 'Not authenticated' });
 
     const { query, type } = req.query;
     if (!query || !type) {

@@ -53,20 +53,6 @@ export const useSpotifyDataStore = defineStore('spotifyData', () => {
     }
   }
 
-  async function getUserData() {
-    if (userData.value === null) {
-      isLoading.value = true;
-      try {
-        const response = await SpotifyDataService.getUserEndpoint();
-        userData.value = response.data;
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        isLoading.value = false;
-      }
-    }
-  }
-
   return { 
     topTracks, 
     topArtists, 
