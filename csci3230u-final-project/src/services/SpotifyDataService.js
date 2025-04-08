@@ -27,12 +27,22 @@ export default {
     return apiClient.get('/user')
   },
   
-  getTopTracksEndpoint() {
-    return apiClient.get('/top-tracks')
+  getTopTracksEndpoint(limit = 5, time_range = 'short_term') {
+    return apiClient.get('/top-tracks', {
+      params: {
+      limit, // Number of top tracks to fetch
+      time_range // Time range for how far back to look for top tracks 
+      }
+    })
   },
 
-  getTopArtistsEndpoint() {
-    return apiClient.get('/top-artists')
+  getTopArtistsEndpoint(limit = 5, time_range = 'short_term') {
+    return apiClient.get('/top-artists', {
+      params: {
+        limit, // Number of top artists to fetch
+        time_range // Time range for how far back to look for top artists 
+      }
+    })
   },
 
   getRecentlyPlayedTracksEndpoint() {

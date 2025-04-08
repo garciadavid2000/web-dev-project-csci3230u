@@ -22,7 +22,6 @@ const goToDetail = () => {
 <template>
   <div class="card" @click="goToDetail">
     <div class="artist-art">
-      <!-- Use the first image from the artist's images array -->
       <img :src="cardProp.images[0]?.url" alt="Artist Image" />
     </div>
 
@@ -60,7 +59,7 @@ const goToDetail = () => {
   height: 80px;
   width: 80px;
   object-fit: cover;
-  border-radius: 50%; /* Circular image */
+  border-radius: 50%;
 }
 
 .artist-info {
