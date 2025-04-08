@@ -4,7 +4,7 @@ import SongCard from '@/components/SongCard.vue';
 // import SongCard from '@/components/SongCard.vue';
 import { useSpotifyDataStore } from '@/stores/spotifyData';
 import { storeToRefs } from 'pinia';
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 
 const spotifyDataStore = useSpotifyDataStore();
 const { topTracks } = storeToRefs(spotifyDataStore);
