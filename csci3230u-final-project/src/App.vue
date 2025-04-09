@@ -1,15 +1,70 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
+import $ from "jquery";
+import { onMounted } from "vue";
+import { useUserDataStore } from "./stores/userData";
+
+const userDataStore = useUserDataStore();
+import { storeToRefs } from "pinia";
+const { userData } = storeToRefs(userDataStore);
+
+onMounted(() => {
+  // Check for click events on the navbar burger icon
+  $(".navbar-burger").click(function () {
+    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+    $(".navbar-burger").toggleClass("is-active");
+    $(".navbar-menu").toggleClass("is-active");
+  });
+});
+
 </script>
 
 <template>
   <header>
-    <nav>
+    <!-- <nav>
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/dashboard">Dashboard</RouterLink>
       <RouterLink to="/top-songs">Top Songs</RouterLink>
       <RouterLink to="/about">About</RouterLink>
       <RouterLink to="/browse">Search</RouterLink>
+    </nav> -->
+    <nav class="navbar is-dark mb-4" role="navigation" aria-label="main navigation">
+      <!-- navbar-brand -->
+      <div class="navbar-brand">
+        <RouterLink to="/">
+          <a class="navbar-item">
+            <!-- made the logo wide and funny looking on purpose because thats how it looked in the lab picures -->
+            <!-- replace the uncommented line with the commented line to have the logo sized evenly -->
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVIHOyzHbOhpoMDZegU6QFAEW05jUtfHwYkQ&s"
+              width="60" height="70" alt="Sudoku Logo" />
+            <!-- <img src="images/logo.gif" alt="Sudoku Logo" /> -->
+          </a>
+        </RouterLink>
+
+        <RouterLink to="/dashboard" class="navbar-item">Epic And Cool Spotify App</RouterLink>
+
+        <!-- Burger item -->
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+          <!-- needed 4 spans otherwise it would only show 2 lines for some reason -->
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <!-- navbar-menu -->
+      <div id="navbarBasicExample" class="navbar-menu">
+        <!-- nav-Start -->
+        <div v-if="userData" class="navbar-start">
+          <!-- Items -->
+          <RouterLink to="/dashboard" class="navbar-item">Dashboard</RouterLink>
+          <RouterLink to="/top-songs" class="navbar-item">Top Songs</RouterLink>
+          <RouterLink to="/about" class="navbar-item">About</RouterLink>
+          <RouterLink to="/browse" class="navbar-item">Search</RouterLink>
+        </div>
+
+      </div>
     </nav>
   </header>
   <div id="content">
@@ -18,51 +73,5 @@ import { RouterLink, RouterView } from "vue-router";
 </template>
 
 <style scoped>
-header {
-  background-color: rgb(46, 53, 67);
-  line-height: 1.5;
-  display: flex;
-  place-items: center;
-  margin: 0;
-  width: 100%;
-}
 
-#content {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-}
-
-nav {
-  width: 100%;
-  font-size: 1rem;
-  text-align: center;
-  margin-top: 2rem;
-  overflow: hidden;
-  /* padding: 10px 20px; */
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end; /* Align items to the right */
-  align-items: center;
-  text-align: left;
-  padding: 1rem 0;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  /* border-left: 1px solid var(--color-border); */
-}
-/* 
-nav a:first-of-type {
-  border: 0;
-} */
 </style>
