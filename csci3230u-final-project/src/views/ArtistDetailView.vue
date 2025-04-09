@@ -80,7 +80,7 @@ onMounted(async () => {//Had to comment this because it kept getting too complic
 }
 
 .detail-card {
-  background-color: #2d2d2d;
+  background-color: #252525;
   border-radius: 12px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   overflow: hidden;
