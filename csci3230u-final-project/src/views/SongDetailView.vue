@@ -32,6 +32,7 @@ const formatDuration = (durationMs) => {
   const seconds = Math.floor((durationMs % 60000) / 1000)
   return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`
 }
+
 </script>
 
 <template>
@@ -47,7 +48,7 @@ const formatDuration = (durationMs) => {
         <div class="popularity-bar-container">
           <span class="flame">🔥</span>
           <div class="popularity-bar">
-            <div class="popularity-fill" :style="{ width: cardProp?.popularity + '%' }"></div>
+            <div class="popularity-fill" :style="{ width: track?.popularity + '%' }"></div>
           </div>
         </div>
         <div class="album-section" v-if="track && track.album">
