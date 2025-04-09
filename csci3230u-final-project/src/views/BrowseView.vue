@@ -25,6 +25,25 @@
         :class="{'active-toggle': searchTypes.artist, 'inactive-toggle': !searchTypes.artist}"
         @click="toggleType('artist')"
       >Artists</button>
+
+      <button class="refresh-button" @click="search">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="feather feather-refresh-cw">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0114.36-3.36L23 10M1 14l5.14 5.36A9 9 0 0020.49 15"></path>
+        </svg>
+
+      </button>
     </div>
     <div v-if="isLoading" class="loader-container">
       <BrowseLoader v-if="loaderToggle"/>
@@ -120,7 +139,7 @@ const searchTypes = ref({
 
 function toggleType(type) {
   searchTypes.value[type] = !searchTypes.value[type];
-  search(); //search again (basically reload search) with updated types
+  //search(); //search again (basically reload search) with updated types
 }
 
 const activeTypes = computed(() => {
@@ -218,4 +237,46 @@ function search() {
   height: 100vh;
   width: 100%;
 }
+
+.toggle-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+button.active-toggle {
+  background-color: rgb(255, 115, 0);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+button.inactive-toggle {
+  background-color: #6e6e6e;
+  color: #000000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.refresh-button {
+  background-color: #444;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.refresh-button:hover {
+  background-color: #666;
+}
+
 </style>
