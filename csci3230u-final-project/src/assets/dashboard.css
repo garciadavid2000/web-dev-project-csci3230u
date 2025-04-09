@@ -1,0 +1,33 @@
+#dashboard {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.welcome {
+  display: block;
+}
+
+#dashboard {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 2rem; /* Add space between the columns */
+  margin-top: 2rem; /* Space between the welcome message and the dashboard */
+}
+
+#userInfo,
+#chartContainer {
+  flex: 1; /* Equal width by default */
+  max-width: 48%; /* Keep them from stretching too much */
+}
+
+#welcome {
+  margin-bottom: 1rem;
+}
+
+#chartWrapper {
+  display: flex;
+  align-items: top;
+  gap: 20px;
+}

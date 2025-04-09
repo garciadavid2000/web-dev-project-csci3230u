@@ -89,6 +89,7 @@ app.get("/api/top-tracks", async (req, res) => {
       name: track.name,
       album: track.album.name,
       artist: track.artists.map((artist) => artist.name).join(", "),
+      artistsArr: track.artists,
       image: track.album.images[0]?.url,
       duration_ms: track.duration_ms,
     }));
@@ -137,11 +138,12 @@ app.get("/api/recently-played", async (req, res) => {
       }
     );
 
-    console.log(response.data.items);
+    // console.log(response.data.items);
     const tracks = response.data.items.map((track) => ({
       name: track.track.name,
       album: track.track.album.name,
       artist: track.track.artists.map((artist) => artist.name).join(", "),
+      artistsArr: track.track.artists,
       image: track.track.album.images[0]?.url,
     }));
     res.json(tracks);
@@ -215,6 +217,20 @@ app.get("/api/artist/:id", async (req, res) => {
       headers: { Authorization: `Bearer ${req.session.access_token}` },
     });
     res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching artist by ID:", error);
+    res.status(500).json({ error: "Failed to fetch artist details" });
+  }
+});
+
+app.get("/api/artists", async (req, res) => {
+  const artistIds = req.query.ids;
+  try {
+    const response = await axios.get(`${SPOTIFY_API_URL}/artists`, {
+      headers: { Authorization: `Bearer ${req.session.access_token}` },
+      params: { ids: artistIds },
+    });
+    res.json(response.data.artists);
   } catch (error) {
     console.error("Error fetching artist by ID:", error);
     res.status(500).json({ error: "Failed to fetch artist details" });
