@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class="{'search-bar-container': true, 'shrunken': isShrunk}">
+    <div v-if="!isLoading" :class="{'search-bar-container': true, 'shrunken': isShrunk}">
       <input
         v-model="searchQuery"
         placeholder="Search for songs..."
@@ -8,6 +8,38 @@
         class="search-bar"
         @focus="handleFocus"
       />
+    </div>
+    <div v-if="isLoading" class="loader-container">
+      <BrowseLoader v-if="loaderToggle"/>
+      <!-- By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL -->
+      <svg v-if="!loaderToggle" width="55" height="80" viewBox="0 0 55 80" xmlns="http://www.w3.org/2000/svg" fill="#FFF">
+          <g transform="matrix(1 0 0 -1 0 80)">
+              <rect width="10" height="20" rx="3">
+                  <animate attributeName="height"
+                      begin="0s" dur="4.3s"
+                      values="20;45;57;80;64;32;66;45;64;23;66;13;64;56;34;34;2;23;76;79;20" calcMode="linear"
+                      repeatCount="indefinite" />
+              </rect>
+              <rect x="15" width="10" height="80" rx="3">
+                  <animate attributeName="height"
+                      begin="0s" dur="2s"
+                      values="80;55;33;5;75;23;73;33;12;14;60;80" calcMode="linear"
+                      repeatCount="indefinite" />
+              </rect>
+              <rect x="30" width="10" height="50" rx="3">
+                  <animate attributeName="height"
+                      begin="0s" dur="1.4s"
+                      values="50;34;78;23;56;23;34;76;80;54;21;50" calcMode="linear"
+                      repeatCount="indefinite" />
+              </rect>
+              <rect x="45" width="10" height="30" rx="3">
+                  <animate attributeName="height"
+                      begin="0s" dur="2s"
+                      values="30;45;13;80;56;72;45;76;34;23;67;30" calcMode="linear"
+                      repeatCount="indefinite" />
+              </rect>
+          </g>
+      </svg>
     </div>
     <div class="search-results">
       <!-- Tracks Column -->
@@ -50,6 +82,7 @@ import SearchArtistCard from '@/components/SearchArtistCard.vue';
 import SearchAlbumCard from '@/components/SearchAlbumCard.vue';
 import { ref } from 'vue';
 import SpotifyDataService from '@/services/SpotifyDataService.js';
+import BrowseLoader from '@/components/BrowseLoader.vue';
 
 const searchQuery = ref('');
 const results = ref(null);
@@ -59,9 +92,18 @@ const handleFocus = () => {
   isShrunk.value = true;
 };
 
+const isLoading = ref(false);
+const loaderToggle = ref(true);
+
 function search() {
   isShrunk.value = true;
-  if (!searchQuery.value) return;
+  isLoading.value = true;
+  results.value = null;
+  if (!searchQuery.value){
+    isLoading.value = false;
+    return;
+  } 
+
   SpotifyDataService.searchTracksEndpoint(searchQuery.value, 'track,artist,album')
     .then(response => {
       console.log("Search query:", response.data);
@@ -69,6 +111,10 @@ function search() {
     })
     .catch(error => {
       console.error("Search failed:", error);
+    })
+    .finally(() => {
+      isLoading.value = false;
+      loaderToggle.value = !loaderToggle.value;
     });
 }
 </script>
@@ -128,5 +174,13 @@ function search() {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
 }
 </style>
