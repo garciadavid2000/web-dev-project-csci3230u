@@ -9,6 +9,23 @@
         @focus="handleFocus"
       />
     </div>
+    <!-- Toggle Buttons -->
+    <div v-if="!isLoading" class="toggle-buttons">
+      <button
+        :class="{'active-toggle': searchTypes.track, 'inactive-toggle': !searchTypes.track}"
+        @click="searchTypes.track = !searchTypes.track"
+      >Songs</button>
+
+      <button
+        :class="{'active-toggle': searchTypes.album, 'inactive-toggle': !searchTypes.album}"
+        @click="searchTypes.album = !searchTypes.album"
+      >Albums</button>
+
+      <button
+        :class="{'active-toggle': searchTypes.artist, 'inactive-toggle': !searchTypes.artist}"
+        @click="searchTypes.artist = !searchTypes.artist"
+      >Artists</button>
+    </div>
     <div v-if="isLoading" class="loader-container">
       <BrowseLoader v-if="loaderToggle"/>
       <!-- By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL -->
@@ -80,7 +97,7 @@
 import SearchSongCard from '@/components/SearchSongCard.vue';
 import SearchArtistCard from '@/components/SearchArtistCard.vue';
 import SearchAlbumCard from '@/components/SearchAlbumCard.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import SpotifyDataService from '@/services/SpotifyDataService.js';
 import BrowseLoader from '@/components/BrowseLoader.vue';
 
@@ -95,6 +112,21 @@ const handleFocus = () => {
 const isLoading = ref(false);
 const loaderToggle = ref(true);
 
+const searchTypes = ref({
+  track: true,
+  album: true,
+  artist: true
+});
+
+
+
+const activeTypes = computed(() => {
+  return Object.entries(searchTypes.value)
+    .filter(([_, active]) => active)
+    .map(([type]) => type)
+    .join(',');
+});
+
 function search() {
   isShrunk.value = true;
   isLoading.value = true;
@@ -104,7 +136,7 @@ function search() {
     return;
   } 
 
-  SpotifyDataService.searchTracksEndpoint(searchQuery.value, 'track,artist,album')
+  SpotifyDataService.searchTracksEndpoint(searchQuery.value, activeTypes.value)
     .then(response => {
       console.log("Search query:", response.data);
       results.value = response.data;
