@@ -33,10 +33,7 @@ onMounted(() => {
       <div class="navbar-brand">
         <RouterLink to="/">
           <a class="navbar-item">
-            <!-- made the logo wide and funny looking on purpose because thats how it looked in the lab picures -->
-            <!-- replace the uncommented line with the commented line to have the logo sized evenly -->
             <img src="@/assets/record-player.svg" width="60" height="70" alt="Record Player Logo" />
-            <!-- <img src="images/logo.gif" alt="Sudoku Logo" /> -->
           </a>
         </RouterLink>
 
