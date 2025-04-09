@@ -33,11 +33,7 @@ onMounted(() => {
       <div class="navbar-brand">
         <RouterLink to="/">
           <a class="navbar-item">
-            <!-- made the logo wide and funny looking on purpose because thats how it looked in the lab picures -->
-            <!-- replace the uncommented line with the commented line to have the logo sized evenly -->
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVIHOyzHbOhpoMDZegU6QFAEW05jUtfHwYkQ&s"
-              width="60" height="70" alt="Sudoku Logo" />
-            <!-- <img src="images/logo.gif" alt="Sudoku Logo" /> -->
+            <img src="@/assets/record-player.svg" width="60" height="70" alt="Record Player Logo" />
           </a>
         </RouterLink>
 
@@ -59,9 +55,19 @@ onMounted(() => {
         <div v-if="userData" class="navbar-start">
           <!-- Items -->
           <RouterLink to="/dashboard" class="navbar-item">Dashboard</RouterLink>
-          <RouterLink to="/top-songs" class="navbar-item">Top Songs</RouterLink>
-          <RouterLink to="/about" class="navbar-item">About</RouterLink>
           <RouterLink to="/browse" class="navbar-item">Search</RouterLink>
+          <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link">
+              Your Favourites
+            </a>
+
+            <div class="navbar-dropdown">
+              <RouterLink to="/top-songs" class="navbar-item">Top Songs</RouterLink>
+              <RouterLink to="/top-artists" class="navbar-item">Top Artists</RouterLink>
+              <RouterLink to="/top-albums" class="navbar-item">Top Albums</RouterLink>
+            </div>
+          </div>
+          <RouterLink to="/about" class="navbar-item">About</RouterLink>
         </div>
 
       </div>

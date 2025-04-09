@@ -36,6 +36,19 @@ const router = createRouter({
       component: TopSongsView,
       meta: { requiresAuth: true },
     },
+    // TODO: Add top artists and top albums routes
+    {
+      path: '/top-artists',
+      name: 'top-songs',
+      component: TopSongsView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/top-albums',
+      name: 'top-songs',
+      component: TopSongsView,
+      meta: { requiresAuth: true },
+    },
     { 
       path: '/browse', 
       name: 'Browse', 
