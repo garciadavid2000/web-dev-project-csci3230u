@@ -13,17 +13,17 @@
     <div v-if="!isLoading" class="toggle-buttons">
       <button
         :class="{'active-toggle': searchTypes.track, 'inactive-toggle': !searchTypes.track}"
-        @click="searchTypes.track = !searchTypes.track"
+        @click="toggleType('track')"
       >Songs</button>
 
       <button
         :class="{'active-toggle': searchTypes.album, 'inactive-toggle': !searchTypes.album}"
-        @click="searchTypes.album = !searchTypes.album"
+        @click="toggleType('album')"
       >Albums</button>
 
       <button
         :class="{'active-toggle': searchTypes.artist, 'inactive-toggle': !searchTypes.artist}"
-        @click="searchTypes.artist = !searchTypes.artist"
+        @click="toggleType('artist')"
       >Artists</button>
     </div>
     <div v-if="isLoading" class="loader-container">
@@ -118,7 +118,10 @@ const searchTypes = ref({
   artist: true
 });
 
-
+function toggleType(type) {
+  searchTypes.value[type] = !searchTypes.value[type];
+  search(); //search again (basically reload search) with updated types
+}
 
 const activeTypes = computed(() => {
   return Object.entries(searchTypes.value)
