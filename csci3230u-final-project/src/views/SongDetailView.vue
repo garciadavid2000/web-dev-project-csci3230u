@@ -72,7 +72,7 @@ const formatDuration = (durationMs) => {
 .detail-card {
   display: flex;
   gap: 20px;
-  background-color: #2d2d2d;
+  background-color: #232323;
   border-radius: 12px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   overflow: hidden;
