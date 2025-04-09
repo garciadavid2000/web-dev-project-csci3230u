@@ -35,8 +35,7 @@ onMounted(() => {
           <a class="navbar-item">
             <!-- made the logo wide and funny looking on purpose because thats how it looked in the lab picures -->
             <!-- replace the uncommented line with the commented line to have the logo sized evenly -->
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVIHOyzHbOhpoMDZegU6QFAEW05jUtfHwYkQ&s"
-              width="60" height="70" alt="Sudoku Logo" />
+            <img src="@/assets/record-player.svg" width="60" height="70" alt="Record Player Logo" />
             <!-- <img src="images/logo.gif" alt="Sudoku Logo" /> -->
           </a>
         </RouterLink>
