@@ -273,6 +273,7 @@ button.inactive-toggle {
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s ease-in-out;
+  vertical-align: middle;
 }
 
 .refresh-button:hover {
