@@ -46,7 +46,7 @@ const formatDuration = (durationMs) => {
         </div>
         <!-- Popularity Bar -->
         <div class="popularity-bar-container">
-          <span class="flame">🔥</span>
+          <span class="flame">🔥 Popularity Score: {{ track?.popularity }}%</span>
           <div class="popularity-bar">
             <div class="popularity-fill" :style="{ width: track?.popularity + '%' }"></div>
           </div>
@@ -158,6 +158,9 @@ const formatDuration = (durationMs) => {
 
 .flame {
   font-size: 20px;
+  color: #c0c0c0;
+  font-weight: bold;
+  min-width: 100px;
 }
 
 .popularity-bar {
