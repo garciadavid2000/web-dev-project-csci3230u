@@ -1,6 +1,7 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue'
+import { watch } from 'vue'
 import SpotifyDataService from '@/services/SpotifyDataService.js'
 import SearchSongCard from '@/components/SearchSongCard.vue'
 import SearchArtistCard from '@/components/SearchArtistCard.vue'
@@ -13,6 +14,10 @@ const depth = ref(5);
 const timeRange = ref('short_term');
 const trackPopularityList = [];
 const artistPopularityList = [];
+const lowestTrack = ref(null);
+const lowestArtist = ref(null);
+const lowestTrackData = ref(null)
+const lowestArtistData = ref(null)
 
 const calculateUndergroundScore = (tracks, artists) => {
   const trackPopularities = tracks.map(t => t.popularity)
@@ -26,6 +31,20 @@ const calculateUndergroundScore = (tracks, artists) => {
 
   return Math.round(100 - avgPopularity)
 }
+
+watch(lowestTrack, async (newTrack) => {
+  if (newTrack?.trackId) {
+    const trackRes = await axios.get(`/api/track/${newTrack.trackId}`)
+    lowestTrackData.value = trackRes.data
+  }
+})
+
+watch(lowestArtist, async (newArtist) => {
+  if (newArtist?.artistId) {
+    const artistRes = await axios.get(`/api/artist/${newArtist.artistId}`)
+    lowestArtistData.value = artistRes.data
+  }
+})
 
 async function getArtistIdByName(artistName) {
     try {
@@ -116,6 +135,14 @@ const fetchDataAndScore = async () => {
         }
     }
 
+    console.log(trackPopularityList)
+    console.log(artistPopularityList)
+
+    lowestTrack.value = trackPopularityList.reduce((min, track) => track.popularity < min.popularity ? track : min, trackPopularityList[0]);
+    lowestArtist.value = artistPopularityList.reduce((min, artist) => artist.popularity < min.popularity ? artist : min, artistPopularityList[0]);
+
+    console.log(lowestTrack)
+
     undergroundScore.value = calculateUndergroundScore(trackPopularityList, artistPopularityList)
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -151,6 +178,7 @@ const fetchDataAndScore = async () => {
                 <option value="long_term">Long Term</option>
             </select>
         </div>
+        <p class="note">(Note that load times increase significantly with higher number of songs)</p>
         
         <button class="rank-btn" @click="fetchDataAndScore" :disabled="loading">
             {{ loading ? 'Calculating...' : 'Calculate My Underground Score' }}
@@ -168,6 +196,27 @@ const fetchDataAndScore = async () => {
         <div v-if="undergroundScore == null" class="loading">
             <h2> ⚙️ Loading ⚙️ </h2>
         </div>
+    </div>
+    <div class="album-section" v-if="undergroundScore !== null && lowestTrack?.trackId">
+        <SearchSongCard
+            :cardProp="{
+            id: lowestTrack.trackId,
+            name: lowestTrack.name,
+            artist: lowestTrack.artist,
+            popularity: lowestTrack.popularity
+            }"
+            cardType="track"
+        />
+    </div>
+    <div class="album-section" v-if="undergroundScore !== null && lowestArtist?.artistId">
+        <SearchArtistCard
+            :cardProp="{
+            id: lowestArtist.artistId,
+            name: lowestArtist.name,
+            popularity: lowestArtist.popularity
+            }"
+            cardType="artist"
+        />
     </div>
 </template>
   
@@ -222,6 +271,10 @@ select {
   color: #fff;
   width: 120px;
   transition: background-color 0.3s ease;
+}
+
+.note {
+    font-size: 15px;
 }
 
 select:hover {
