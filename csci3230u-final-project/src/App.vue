@@ -38,7 +38,7 @@ onMounted(() => {
           </a>
         </RouterLink>
 
-        <RouterLink to="/dashboard" class="navbar-item">Epic And Cool Spotify App</RouterLink>
+        <RouterLink to="/" class="navbar-item">Epic And Cool Spotify App</RouterLink>
 
         <!-- Burger item -->
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
