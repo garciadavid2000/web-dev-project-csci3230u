@@ -56,6 +56,7 @@ onMounted(() => {
           <!-- Items -->
           <RouterLink to="/dashboard" class="navbar-item">Dashboard</RouterLink>
           <RouterLink to="/browse" class="navbar-item">Search</RouterLink>
+          <RouterLink to="/tunerank" class="navbar-item">TuneRank</RouterLink>
           <div class="navbar-item has-dropdown is-hoverable">
             <a class="navbar-link">
               Your Favourites

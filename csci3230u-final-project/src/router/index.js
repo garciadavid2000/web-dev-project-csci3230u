@@ -7,6 +7,7 @@ import BrowseView from '@/views/BrowseView.vue';
 import SongDetailView from '@/views/SongDetailView.vue';
 import ArtistDetailView from '@/views/ArtistDetailView.vue';
 import AlbumDetailView from '@/views/AlbumDetailView.vue';
+import TuneRankView from '@/views/TuneRankView.vue';
 
 
 const router = createRouter({
@@ -53,6 +54,12 @@ const router = createRouter({
       path: '/browse', 
       name: 'Browse', 
       component: BrowseView,
+      meta: { requiresAuth: true },
+    },
+    { 
+      path: '/tunerank', 
+      name: 'TuneRank', 
+      component: TuneRankView,
       meta: { requiresAuth: true },
     },
     { 
