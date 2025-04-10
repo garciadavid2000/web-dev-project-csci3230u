@@ -34,9 +34,18 @@ export default {
       const recentlyPlayedResponse = await SpotifyDataService.getRecentlyPlayedTracksEndpoint()
       this.recentlyPlayed = recentlyPlayedResponse.data.items.map((e) => e.track)
 
-      const recentArtistIds = Array.from(
-        new Set(this.recentlyPlayed.map((track) => track.artists.map((artist) => artist.id))),
-      )
+      let recentArtistIds = new Set()
+      this.recentlyPlayed.forEach((track) => {
+        const artistIds = track.artists.map((artist) => artist.id)
+        if (recentArtistIds.size + artistIds.length > 50) {
+          return
+        }
+        artistIds.forEach((id) => {
+          recentArtistIds.add(id)
+        })
+      })
+      recentArtistIds = Array.from(recentArtistIds)
+
       // Get full artist data
       const recentArtistsArr = (await SpotifyDataService.getArtistsByIds(recentArtistIds)).data
       const recentArtistsMap = {}
@@ -56,9 +65,17 @@ export default {
       })
 
       // get full authors for top songs
-      const topArtistIds = Array.from(
-        new Set(this.topSongs.map((track) => track.artists.map((artist) => artist.id))),
-      )
+      let topArtistIds = new Set()
+      this.topSongs.forEach((track) => {
+        const artistIds = track.artists.map((artist) => artist.id)
+        if (topArtistIds.size + artistIds.length > 50) {
+          return
+        }
+        artistIds.forEach((id) => {
+          topArtistIds.add(id)
+        })
+      })
+      topArtistIds = Array.from(topArtistIds)
 
       // Get full artist data
       const topArtistsArr = (await SpotifyDataService.getArtistsByIds(topArtistIds)).data
