@@ -55,8 +55,6 @@ onMounted(() => {
         <div v-if="userData" class="navbar-start">
           <!-- Items -->
           <RouterLink to="/dashboard" class="navbar-item">Dashboard</RouterLink>
-          <RouterLink to="/browse" class="navbar-item">Search</RouterLink>
-          <RouterLink to="/tunerank" class="navbar-item">TuneRank</RouterLink>
           <div class="navbar-item has-dropdown is-hoverable">
             <a class="navbar-link">
               Your Favourites
@@ -68,6 +66,8 @@ onMounted(() => {
               <RouterLink to="/top-albums" class="navbar-item">Top Albums</RouterLink>
             </div>
           </div>
+          <RouterLink to="/tunerank" class="navbar-item">TasteRank</RouterLink>
+          <RouterLink to="/browse" class="navbar-item">Search</RouterLink>
           <RouterLink to="/about" class="navbar-item">About</RouterLink>
         </div>
 

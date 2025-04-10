@@ -7,7 +7,7 @@ import SearchArtistCard from '@/components/SearchArtistCard.vue'
 
 const topTracks = ref([])
 const topArtists = ref([])
-const undergroundScore = ref(null)
+const undergroundScore = ref('?')
 const loading = ref(false)
 const depth = ref(5);
 const timeRange = ref('short_term');
@@ -127,8 +127,10 @@ const fetchDataAndScore = async () => {
 
 <template>
     <div class="tunerank-container">
-        <h1>TuneRank</h1>
-        <p>Click below to see how underground your music taste is 🎧</p>
+        <h1>TasteRank</h1>
+        <p class="hook">Click below to see how underground your taste in music is!</p>
+        <p>Select the data range and recency from the dropdowns below to customize your preferences.
+        </p>
 
         <div class="dropdowns">
             <!-- Dropdown for selecting the depth -->
@@ -155,8 +157,17 @@ const fetchDataAndScore = async () => {
         </button>
 
         <div v-if="undergroundScore !== null" class="score-display">
-            <p>Your Underground Score:</p>
+            <p>Your Underground Music Taste Score:</p>
             <h2>{{ undergroundScore }} / 100</h2>
+        </div>
+        <div v-if="undergroundScore !== null" class="popularity-bar-container">
+          <span class="flame">🚪 Underground Score : {{ undergroundScore }} %</span>
+          <div class="popularity-bar">
+            <div class="popularity-fill" :style="{ width: undergroundScore + '%' }"></div>
+          </div>
+        </div>
+        <div v-if="undergroundScore == null" class="loading">
+            <h2> ⚙️ Loading ⚙️ </h2>
         </div>
     </div>
 </template>
@@ -167,18 +178,68 @@ const fetchDataAndScore = async () => {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  background-color: #222;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #ffa500;
+  margin-bottom: 1rem;
+}
+
+p {
+  font-size: 1.2rem;
+  color: #ddd;
+  margin-bottom: 2rem;
+}
+
+.dropdowns {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label {
+  font-size: 1.1rem;
+  color: #ccc;
+}
+
+select {
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #333;
+  color: #fff;
+  width: 120px;
+  transition: background-color 0.3s ease;
+}
+
+select:hover {
+  background-color: #555;
 }
 
 .rank-btn {
   background-color: #ffa500;
   border: none;
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
+  padding: 0.8rem 2rem;
+  font-size: 1.2rem;
   font-weight: bold;
   color: #1e1e1e;
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 2rem;
 }
 
 .rank-btn:hover {
@@ -192,5 +253,45 @@ const fetchDataAndScore = async () => {
 .score-display h2 {
   font-size: 3rem;
   color: #ffa500;
+}
+
+.hook {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.popularity-container {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  gap: 6px;
+}
+
+.flame {
+  font-size: 20px;
+  color: #c0c0c0;
+  font-weight: bold;
+  min-width: 100px;
+}
+
+.popularity-bar {
+  flex-grow: 1;
+  height: 8px;
+  background-color: #7777776c;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.popularity-fill {
+  height: 100%;
+  background-color: #FF5733;
+  transition: width 0.3s ease;
+}
+
+.loading {
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin-top: 2rem;
 }
 </style>
