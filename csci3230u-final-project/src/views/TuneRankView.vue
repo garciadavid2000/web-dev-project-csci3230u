@@ -1,18 +1,23 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue'
+import { watch } from 'vue'
 import SpotifyDataService from '@/services/SpotifyDataService.js'
 import SearchSongCard from '@/components/SearchSongCard.vue'
 import SearchArtistCard from '@/components/SearchArtistCard.vue'
 
 const topTracks = ref([])
 const topArtists = ref([])
-const undergroundScore = ref(null)
+const undergroundScore = ref('?')
 const loading = ref(false)
 const depth = ref(5);
 const timeRange = ref('short_term');
 const trackPopularityList = [];
 const artistPopularityList = [];
+const lowestTrack = ref(null);
+const lowestArtist = ref(null);
+const lowestTrackData = ref(null)
+const lowestArtistData = ref(null)
 
 const calculateUndergroundScore = (tracks, artists) => {
   const trackPopularities = tracks.map(t => t.popularity)
@@ -26,6 +31,20 @@ const calculateUndergroundScore = (tracks, artists) => {
 
   return Math.round(100 - avgPopularity)
 }
+
+watch(lowestTrack, async (newTrack) => {
+  if (newTrack?.trackId) {
+    const trackRes = await axios.get(`/api/track/${newTrack.trackId}`)
+    lowestTrackData.value = trackRes.data
+  }
+})
+
+watch(lowestArtist, async (newArtist) => {
+  if (newArtist?.artistId) {
+    const artistRes = await axios.get(`/api/artist/${newArtist.artistId}`)
+    lowestArtistData.value = artistRes.data
+  }
+})
 
 async function getArtistIdByName(artistName) {
     try {
@@ -116,6 +135,14 @@ const fetchDataAndScore = async () => {
         }
     }
 
+    console.log(trackPopularityList)
+    console.log(artistPopularityList)
+
+    lowestTrack.value = trackPopularityList.reduce((min, track) => track.popularity < min.popularity ? track : min, trackPopularityList[0]);
+    lowestArtist.value = artistPopularityList.reduce((min, artist) => artist.popularity < min.popularity ? artist : min, artistPopularityList[0]);
+
+    console.log(lowestTrack)
+
     undergroundScore.value = calculateUndergroundScore(trackPopularityList, artistPopularityList)
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -127,8 +154,10 @@ const fetchDataAndScore = async () => {
 
 <template>
     <div class="tunerank-container">
-        <h1>TuneRank</h1>
-        <p>Click below to see how underground your music taste is 🎧</p>
+        <h1>TasteRank</h1>
+        <p class="hook">Click below to see how underground your taste in music is!</p>
+        <p>Select the data range and recency from the dropdowns below to customize your preferences.
+        </p>
 
         <div class="dropdowns">
             <!-- Dropdown for selecting the depth -->
@@ -149,15 +178,45 @@ const fetchDataAndScore = async () => {
                 <option value="long_term">Long Term</option>
             </select>
         </div>
+        <p class="note">(Note that load times increase significantly with higher number of songs)</p>
         
         <button class="rank-btn" @click="fetchDataAndScore" :disabled="loading">
             {{ loading ? 'Calculating...' : 'Calculate My Underground Score' }}
         </button>
 
         <div v-if="undergroundScore !== null" class="score-display">
-            <p>Your Underground Score:</p>
-            <h2>{{ undergroundScore }} / 100</h2>
+            <p> Your Underground Music Taste Score:</p>
+            <h2>🌌 {{ undergroundScore }} / 100 🌌</h2>
         </div>
+        <div v-if="undergroundScore !== null" class="popularity-bar-container">
+          <div class="popularity-bar">
+            <div class="popularity-fill" :style="{ width: undergroundScore + '%' }"></div>
+          </div>
+        </div>
+        <div v-if="undergroundScore == null" class="loading">
+            <h2> ⚙️ Loading ⚙️ </h2>
+        </div>
+    </div>
+    <div class="album-section" v-if="undergroundScore !== null && lowestTrack?.trackId">
+        <SearchSongCard
+            :cardProp="{
+            id: lowestTrack.trackId,
+            name: lowestTrack.name,
+            artist: lowestTrack.artist,
+            popularity: lowestTrack.popularity
+            }"
+            cardType="track"
+        />
+    </div>
+    <div class="album-section" v-if="undergroundScore !== null && lowestArtist?.artistId">
+        <SearchArtistCard
+            :cardProp="{
+            id: lowestArtist.artistId,
+            name: lowestArtist.name,
+            popularity: lowestArtist.popularity
+            }"
+            cardType="artist"
+        />
     </div>
 </template>
   
@@ -167,22 +226,76 @@ const fetchDataAndScore = async () => {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  background-color: #222;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #2b75ff;
+  margin-bottom: 1rem;
+}
+
+p {
+  font-size: 1.2rem;
+  color: #ddd;
+  margin-bottom: 2rem;
+}
+
+.dropdowns {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label {
+  font-size: 1.1rem;
+  color: #ccc;
+}
+
+select {
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #333;
+  color: #fff;
+  width: 120px;
+  transition: background-color 0.3s ease;
+}
+
+.note {
+    font-size: 15px;
+}
+
+select:hover {
+  background-color: #555;
 }
 
 .rank-btn {
-  background-color: #ffa500;
+  background-color: #85e2d5;
   border: none;
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
+  padding: 0.8rem 2rem;
+  font-size: 1.2rem;
   font-weight: bold;
   color: #1e1e1e;
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 2rem;
 }
 
 .rank-btn:hover {
-  background-color: #ff8c00;
+  background-color: #3460ab;
 }
 
 .score-display {
@@ -191,6 +304,47 @@ const fetchDataAndScore = async () => {
 
 .score-display h2 {
   font-size: 3rem;
-  color: #ffa500;
+  color: #59d6f1;
+}
+
+.hook {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.popularity-container {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  gap: 6px;
+}
+
+.flame {
+  font-size: 20px;
+  color: #c0c0c0;
+  font-weight: bold;
+  min-width: 100px;
+}
+
+.popularity-bar {
+  flex-grow: 1;
+  height: 15px;
+  background-color: #7777776c;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.popularity-fill {
+  height: 100%;
+  background-color: #bcf2ff;
+  transition: width 0.3s ease;
+}
+
+.loading {
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin-top: 2rem;
 }
 </style>
