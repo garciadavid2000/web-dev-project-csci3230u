@@ -9,6 +9,8 @@ const topTracks = ref([])
 const topArtists = ref([])
 const undergroundScore = ref(null)
 const loading = ref(false)
+const depth = ref(5);
+const timeRange = ref('short_term');
 const trackPopularityList = [];
 const artistPopularityList = [];
 
@@ -63,10 +65,13 @@ async function getTrackIdByName(trackName, artistName, albumName) {
 
 const fetchDataAndScore = async () => {
   loading.value = true
+  trackPopularityList.length = 0;
+  artistPopularityList.length = 0;
+  undergroundScore.value = null;
   try {
     const [tracksRes, artistsRes] = await Promise.all([
-      SpotifyDataService.getTopTracksEndpoint(),
-      SpotifyDataService.getTopArtistsEndpoint()
+      SpotifyDataService.getTopTracksEndpoint(depth.value, timeRange.value),
+      SpotifyDataService.getTopArtistsEndpoint(depth.value, timeRange.value)
     ])
 
     for (const track of tracksRes.data.tracks) {
@@ -124,6 +129,26 @@ const fetchDataAndScore = async () => {
     <div class="tunerank-container">
         <h1>TuneRank</h1>
         <p>Click below to see how underground your music taste is 🎧</p>
+
+        <div class="dropdowns">
+            <!-- Dropdown for selecting the depth -->
+            <label for="depth">Select number of songs:</label>
+            <select v-model="depth" id="depth">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+            </select>
+
+            <!-- Dropdown for selecting the time range -->
+            <label for="timeRange">Select time range:</label>
+            <select v-model="timeRange" id="timeRange">
+                <option value="short_term">Short Term</option>
+                <option value="medium_term">Medium Term</option>
+                <option value="long_term">Long Term</option>
+            </select>
+        </div>
         
         <button class="rank-btn" @click="fetchDataAndScore" :disabled="loading">
             {{ loading ? 'Calculating...' : 'Calculate My Underground Score' }}
