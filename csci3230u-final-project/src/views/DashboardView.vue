@@ -1,108 +1,120 @@
-<template>
-  <div id="dashboardContainer">
-    <h1 class="welcome">Welcome, {{ user.display_name }}</h1>
-    <div id="dashboard">
-      <div id="userInfo">
-        <h2>Your Top 5 Songs:</h2>
-        <div v-if="topSongs" class="song-cards-container">
-          <h2>Your Top Songs:</h2>
-          <SearchSongCard
-            v-for="song in topSongs"
-            :key="song.track_id"
-            :cardProp="song"
-            cardType="song"
-          />
-        </div>
-        <button @click="logout">Logout</button>
-      </div>
-      <div id="chartContainer">
-        <h2>Data Visualizations:</h2>
-        <div id="sourceButtons">
-          <button class="sourceButton active">Recent</button>
-          <button class="sourceButton">Top</button>
-        </div>
-        <div id="chartButtons">
-          <button class="chartButton active">Albums</button>
-          <button class="chartButton">Artists</button>
-          <button class="chartButton">Genres</button>
-        </div>
-        <div id="chartWrapper">
-          <div id="chart"></div>
-          <div id="legend"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script>
-import axios from 'axios'
+<script setup>
 import $ from 'jquery'
 import * as d3 from 'd3'
-import SearchSongCard from '@/components/SearchSongCard.vue';
-import SpotifyDataService from '@/services/SpotifyDataService.js';
-
+// import SearchSongCard from '@/components/SearchSongCard.vue'
+import SpotifyDataService from '@/services/SpotifyDataService.js'
+</script>
+<script>
 export default {
   name: 'DashboardView',
+  data() {
+    return {
+      user: {},
+      topSongs: [],
+      topArtists: [],
+      recentlyPlayed: [],
+    }
+  },
   // Register the component here:
   async mounted() {
-  try {
-    // Fetch user data using service method
-    const userResponse = await SpotifyDataService.getUserEndpoint()
-    this.user = userResponse.data
+    try {
+      // Fetch user data using service method
+      const userResponse = await SpotifyDataService.getUserEndpoint()
+      this.user = userResponse.data
 
-    // Fetch top tracks (limit = 5, time_range = 'short_term') using service method
-    const topTracksResponse = await SpotifyDataService.getTopTracksEndpoint(5, 'short_term')
-    this.topSongs = topTracksResponse.data.tracks
-    this.totalListeningTime = topTracksResponse.data.totalListeningTimeMinutes
+      // Fetch top tracks (limit = 5, time_range = 'short_term') using service method
+      const topTracksResponse = await SpotifyDataService.getTopTracksEndpoint(5, 'short_term')
+      this.topSongs = topTracksResponse.data.items
 
-    // Fetch top artists (limit = 5, time_range = 'short_term') using service method
-    const topArtistsResponse = await SpotifyDataService.getTopArtistsEndpoint(5, 'short_term')
-    this.topArtists = topArtistsResponse.data
+      // Fetch top artists (limit = 5, time_range = 'short_term') using service method
+      const topArtistsResponse = await SpotifyDataService.getTopArtistsEndpoint(5, 'short_term')
+      this.topArtists = topArtistsResponse.data.items
 
-    // Fetch recently played tracks using service method
-    const recentlyPlayedResponse = await SpotifyDataService.getRecentlyPlayedTracksEndpoint()
-    this.recentlyPlayed = recentlyPlayedResponse.data
+      // Fetch recently played tracks using service method
+      const recentlyPlayedResponse = await SpotifyDataService.getRecentlyPlayedTracksEndpoint()
+      this.recentlyPlayed = recentlyPlayedResponse.data.items.map((e) => e.track)
 
-    
-    // --- Chart Buttons & Rendering (Legacy jQuery-based logic) ---
-    let dataSource = 'recent'
-    let dataType = 'albums'
-    const vm = this // preserve component context
+      const recentArtistIds = Array.from(
+        new Set(this.recentlyPlayed.map((track) => track.artists.map((artist) => artist.id))),
+      )
+      // Get full artist data
+      const recentArtistsArr = (await SpotifyDataService.getArtistsByIds(recentArtistIds)).data
+      const recentArtistsMap = {}
+      recentArtistsArr.forEach((artist) => {
+        recentArtistsMap[artist.id] = artist
+      })
+      // Map the artist data to the tracks
+      this.recentlyPlayed = this.recentlyPlayed.map((track) => {
+        track.artists = track.artists.map((artist) => {
+          const fullArtist = recentArtistsMap[artist.id]
+          return {
+            ...artist,
+            genres: fullArtist ? fullArtist.genres : [],
+          }
+        })
+        return track
+      })
 
-    $('.sourceButton').click(function () {
-      if ($(this).hasClass('active')) return
-      $('.sourceButton').removeClass('active')
-      $(this).addClass('active')
-      dataSource = $(this).text() === 'Recent' ? 'recent' : 'top'
-      const data = vm.getChartData(dataSource, dataType)
-      vm.updateChart(data)
-    })
-    $('.chartButton').click(function () {
-      if ($(this).hasClass('active')) return
-      $('.chartButton').removeClass('active')
-      $(this).addClass('active')
-      if ($(this).text() === 'Albums') {
-        dataType = 'albums'
-      } else if ($(this).text() === 'Artists') {
-        dataType = 'artists'
-      } else if ($(this).text() === 'Genres') {
-        dataType = 'genres'
-      }
-      const data = vm.getChartData(dataSource, dataType)
-      vm.updateChart(data)
-    })
-    const chartData = this.getChartData(dataSource, dataType)
-    this.updateChart(chartData)
-  } catch (error) {
-    console.error('Error fetching data:', error)
-  }
-}
-,
+      // get full authors for top songs
+      const topArtistIds = Array.from(
+        new Set(this.topSongs.map((track) => track.artists.map((artist) => artist.id))),
+      )
+
+      // Get full artist data
+      const topArtistsArr = (await SpotifyDataService.getArtistsByIds(topArtistIds)).data
+      const topArtistsMap = {}
+      topArtistsArr.forEach((artist) => {
+        topArtistsMap[artist.id] = artist
+      })
+      // Map the artist data to the tracks
+      this.topSongs = this.topSongs.map((track) => {
+        track.artists = track.artists.map((artist) => {
+          const fullArtist = topArtistsMap[artist.id]
+          return {
+            ...artist,
+            genres: fullArtist ? fullArtist.genres : [],
+          }
+        })
+        return track
+      })
+
+      // Setting up data visualizations and controls with JQuery and D3
+      let dataSource = 'recent'
+      let dataType = 'albums'
+      const vm = this // preserve component context
+
+      $('.sourceButton').click(function () {
+        if ($(this).hasClass('active')) return
+        $('.sourceButton').removeClass('active')
+        $(this).addClass('active')
+        dataSource = $(this).text() === 'Recent' ? 'recent' : 'top'
+        const data = vm.getChartData(dataSource, dataType)
+        vm.updateChart(data)
+      })
+      $('.chartButton').click(function () {
+        if ($(this).hasClass('active')) return
+        $('.chartButton').removeClass('active')
+        $(this).addClass('active')
+        if ($(this).text() === 'Albums') {
+          dataType = 'albums'
+        } else if ($(this).text() === 'Artists') {
+          dataType = 'artists'
+        } else if ($(this).text() === 'Genres') {
+          dataType = 'genres'
+        }
+        const data = vm.getChartData(dataSource, dataType)
+        vm.updateChart(data)
+      })
+      const chartData = this.getChartData(dataSource, dataType)
+      this.updateChart(chartData)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  },
   methods: {
-    logout() {
-      window.location.href = '/api/logout'
-    },
+    // logout() {
+    //   window.location.href = '/api/logout'
+    // },
     getChartData(source, type) {
       const data = source === 'recent' ? this.recentlyPlayed : this.topSongs
       if (type === 'albums') {
@@ -120,7 +132,7 @@ export default {
       } else if (type === 'artists') {
         let artists = {}
         data.forEach((track) => {
-          track.artistsArr.forEach((artist) => {
+          track.artists.forEach((artist) => {
             const name = artist.name.trim()
             artists[name] = (artists[name] || 0) + 1
           })
@@ -133,7 +145,7 @@ export default {
       } else if (type === 'genres') {
         let genres = {}
         data.forEach((track) => {
-          track.artistsArr.forEach((artist) => {
+          track.artists.forEach((artist) => {
             artist.genres.forEach((genre) => {
               genre = genre.trim()
               genres[genre] = (genres[genre] || 0) + 1
@@ -158,7 +170,7 @@ export default {
         $('#chart').append('<p>No data available</p>')
         return
       }
-      const chart = $('#chart').css('width', '100%').css('height', '400px')
+      const chart = $('#chart').css('height', '400px')
       const width = 300
       const height = 300
       const svg = d3
@@ -235,5 +247,41 @@ export default {
   },
 }
 </script>
+<template>
+  <div id="dashboardContainer">
+    <h1 class="welcome">Welcome, {{ user.display_name }}</h1>
+    <!-- <div id="dashboard"> -->
+    <!-- <div id="userInfo">
+        <h2>Your Top 5 Songs:</h2>
+        <div v-if="topSongs" class="song-cards-container">
+          <SearchSongCard
+            v-for="song in topSongs"
+            :key="song.id"
+            :cardProp="song"
+            cardType="song"
+          />
+        </div>
+      </div> -->
+    <div id="chartContainer">
+      <!-- <h2>Data Visualizations:</h2> -->
+      <div id="buttons">
+        <div id="sourceButtons">
+          <button class="sourceButton active">Recent</button>
+          <button class="sourceButton">Top</button>
+        </div>
+        <div id="chartButtons">
+          <button class="chartButton active">Albums</button>
+          <button class="chartButton">Artists</button>
+          <button class="chartButton">Genres</button>
+        </div>
+      </div>
+      <div id="chartWrapper">
+        <div id="chart"></div>
+        <div id="legend"></div>
+      </div>
+    </div>
+    <!-- </div> -->
+  </div>
+</template>
 
 <style scoped src="../assets/dashboard.css"></style>
