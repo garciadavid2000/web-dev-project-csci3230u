@@ -11,7 +11,7 @@
     SESSION_SECRET=your_secret_value #node -e "console.log(require('crypto').randomBytes(64).toString('hex'));"
     SPOTIFY_CLIENT_ID=your_spotify_client_id # Look at https://developer.spotify.com/documentation/web-api 
     SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-    SPOTIFY_REDIRECT_URI=http://localhost:3000/callback
+    SPOTIFY_REDIRECT_URI=http://localhost:3000/api/callback
 
 3. **Run the App**
 ```bash
