@@ -1,5 +1,5 @@
 #using node.js img
-FROM node:18.20.8-slim
+FROM node:23.11.0-slim
 
 #set working dir
 WORKDIR /app
