@@ -17,9 +17,11 @@ const calculateUndergroundScore = (tracks, artists) => {
   const artistPopularities = artists.map(a => a.popularity)
 
   const combined = [...trackPopularities, ...artistPopularities]
+
   if (combined.length === 0) return 0
 
-  const avgPopularity = combined.reduce((sum, val) => sum+val, 0) / combined.length
+  const avgPopularity = combined.reduce((sum, val) => sum + val, 0) / combined.length
+
   return Math.round(100 - avgPopularity)
 }
 
@@ -88,8 +90,6 @@ const fetchDataAndScore = async () => {
         }
     }
 
-    console.log(artistsRes)
-
     for (const artist of artistsRes.data) {
         try {
             // Need to manually search for artist id
@@ -111,7 +111,7 @@ const fetchDataAndScore = async () => {
         }
     }
 
-    //undergroundScore.value = calculateUndergroundScore(topTracks.value, topArtists.value)
+    undergroundScore.value = calculateUndergroundScore(trackPopularityList, artistPopularityList)
   } catch (error) {
     console.error('Error fetching data:', error)
   } finally {
