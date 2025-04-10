@@ -246,7 +246,7 @@ function search() {
 }
 
 button.active-toggle {
-  background-color: rgb(255, 115, 0);
+  background-color: #ff7300;
   color: white;
   border: none;
   padding: 10px 20px;
