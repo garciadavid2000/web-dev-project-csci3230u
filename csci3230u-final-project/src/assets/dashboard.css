@@ -7,13 +7,17 @@
 }
 
 #dashboardContainer {
-  padding: 0 4rem;
+  padding: 2rem 4rem;
 }
 
 .welcome {
   display: block;
   margin-bottom: 1rem;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  background-color: whitesmoke;
+  padding: 0.5rem 1rem;
+  width: fit-content;
+  border-radius: 8px;
 }
 
 /* Buttons */
@@ -31,7 +35,7 @@
   color: rgb(193, 163, 98);
   border: 2px solid rgb(193, 163, 98);
   border-radius: 34px;
-  background-color: transparent;
+  background-color: whitesmoke;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   overflow: hidden;
@@ -61,6 +65,7 @@
   display: flex;
   gap: 20px;
   justify-content: center;
+  margin-top: 2rem;
 }
 
 #chartContainer {
@@ -68,4 +73,19 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+#chart p {
+  margin-top: 2rem;
+}
+
+#chart {
+  background-color: whitesmoke;
+  border-radius: 8px;
+}
+
+#legend {
+  background-color: whitesmoke;
+  padding: 1rem;
+  border-radius: 8px;
 }
