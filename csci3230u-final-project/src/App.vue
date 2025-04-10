@@ -2,7 +2,8 @@
 import { RouterLink, RouterView } from "vue-router";
 import $ from "jquery";
 import { onMounted } from "vue";
-import { useUserDataStore } from "./stores/userData";
+import { useUserDataStore } from "@/stores/userData";
+import IconRecordPlayer from "@/components/icons/IconRecordPlayer.vue";
 
 const userDataStore = useUserDataStore();
 import { storeToRefs } from "pinia";
@@ -33,7 +34,7 @@ onMounted(() => {
       <div class="navbar-brand">
         <RouterLink to="/">
           <a class="navbar-item">
-            <img src="@/assets/record-player.svg" width="60" height="70" alt="Record Player Logo" />
+            <IconRecordPlayer />
           </a>
         </RouterLink>
 
@@ -56,6 +57,7 @@ onMounted(() => {
           <!-- Items -->
           <RouterLink to="/dashboard" class="navbar-item">Dashboard</RouterLink>
           <RouterLink to="/browse" class="navbar-item">Search</RouterLink>
+          <RouterLink to="/tunerank" class="navbar-item">TuneRank</RouterLink>
           <div class="navbar-item has-dropdown is-hoverable">
             <a class="navbar-link">
               Your Favourites
