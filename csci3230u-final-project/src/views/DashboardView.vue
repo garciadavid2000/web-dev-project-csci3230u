@@ -167,10 +167,10 @@ export default {
       $('#chart').empty()
       $('#legend').empty()
       if (data.length === 0) {
-        $('#chart').append('<p>No data available</p>')
+        $('#chart').append('<p>No data available</p>').css('margin-top', '2rem')
         return
       }
-      const chart = $('#chart').css('height', '400px')
+      const chart = $('#chart')
       const width = 300
       const height = 300
       const svg = d3
@@ -219,7 +219,6 @@ export default {
       const legend = d3
         .select(legendEl)
         .append('svg')
-        .attr('width', 200)
         .attr('height', data.length * 25)
         .selectAll('legendItems')
         .data(data.map((d) => d.name))
