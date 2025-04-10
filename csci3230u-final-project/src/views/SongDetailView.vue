@@ -75,6 +75,7 @@ const formatDuration = (durationMs) => {
   max-width: 900px;
   margin: 30px auto;
   padding: 20px;
+  height: auto;
 }
 
 .detail-card {
@@ -84,6 +85,7 @@ const formatDuration = (durationMs) => {
   border-radius: 12px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  height: auto;
 }
 .main-column {
   flex: 2;

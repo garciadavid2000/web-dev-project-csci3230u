@@ -151,7 +151,7 @@ const fetchDataAndScore = async () => {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  background-color: #222;
+  background-color: #222222e7;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   color: #fff;

@@ -17,6 +17,15 @@ onMounted(async () => {
 
 <template>
     <div v-if="recentlyPlayedTracks && recentlyPlayedTracks.items" class="song-cards-container">
+    <h2 class="header">Your Recent Played Tracks:</h2>
+    <SearchSongCard
+      v-for="song in recentlyPlayedTracks.items"
+      :key="song.track.id"
+      :cardProp="song.track"
+      cardType="song"
+    />
+  </div>
+</template>
       <h2 class="header">Your Recently Played Songs:</h2>
       <SearchSongCard
         v-for="song in recentlyPlayedTracks.items"
