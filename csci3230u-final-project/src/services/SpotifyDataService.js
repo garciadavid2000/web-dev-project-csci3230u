@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios'
 
 // Single Axios instance for our app.
 const apiClient = axios.create({
@@ -21,18 +21,17 @@ const apiClient = axios.create({
 // Any module that imports this file using the default import syntax will get this object.
 
 export default {
-  
   // Export method to get user data
   getUserEndpoint() {
     return apiClient.get('/user')
   },
-  
+
   getTopTracksEndpoint(limit = 5, time_range = 'short_term') {
     return apiClient.get('/top-tracks', {
       params: {
-      limit, // Number of top tracks to fetch
-      time_range // Time range for how far back to look for top tracks 
-      }
+        limit, // Number of top tracks to fetch
+        time_range, // Time range for how far back to look for top tracks
+      },
     })
   },
 
@@ -40,8 +39,8 @@ export default {
     return apiClient.get('/top-artists', {
       params: {
         limit, // Number of top artists to fetch
-        time_range // Time range for how far back to look for top artists 
-      }
+        time_range, // Time range for how far back to look for top artists
+      },
     })
   },
 
@@ -49,42 +48,47 @@ export default {
     return apiClient.get('/recently-played')
   },
 
-  searchTracksEndpoint(query,type) {
+  searchTracksEndpoint(query, type) {
     return apiClient.get('/search', {
       params: {
         query: query,
-        type: type
-      }
-    });
+        type: type,
+      },
+    })
   },
 
   getTrackById(id) {
-    return apiClient.get(`/track/${id}`);
+    return apiClient.get(`/track/${id}`)
   },
 
   getArtistById(id) {
-    return apiClient.get(`/artist/${id}`);
+    return apiClient.get(`/artist/${id}`)
   },
 
   getArtistTopTracks(id) {
-    return apiClient.get(`/artist/${id}/top-tracks`);
+    return apiClient.get(`/artist/${id}/top-tracks`)
   },
 
   getAlbumById(id) {
-    return apiClient.get(`/album/${id}`);
+    return apiClient.get(`/album/${id}`)
   },
-  
+
   getAlbumTracks(id, limit = 20, offset = 0, market = 'US') {
     return apiClient.get(`/album/${id}/tracks`, {
-      params: { limit, offset, market }
-    });
+      params: { limit, offset, market },
+    })
   },
 
   getArtistAlbums(id, limit = 5, market = 'US') {
     return apiClient.get(`/artist/${id}/albums`, {
-      params: { include_groups: 'album', limit, market }
-    });
-  }
-  
-  
+      params: { include_groups: 'album', limit, market },
+    })
+  },
+
+  getArtistsByIds(ids) {
+    ids = ids.join(',')
+    return apiClient.get('/artists', {
+      params: { ids },
+    })
+  },
 }
