@@ -1,22 +1,28 @@
 <script setup>
 // @ is an alias for src, making this an absolute path
-import SongCard from '@/components/SearchSongCard.vue';
-// import SongCard from '@/components/SongCard.vue';
+import SearchSongCard from '@/components/SearchSongCard.vue';
 import { useSpotifyDataStore } from '@/stores/spotifyData';
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 
 const spotifyDataStore = useSpotifyDataStore();
-const { topTracks } = storeToRefs(spotifyDataStore);
+const { recentlyPlayedTracks } = storeToRefs(spotifyDataStore);
 
 onMounted(async () => {
-  await spotifyDataStore.getTopTracks(50, 'long_term'); // make sure the data has loaded
+  await spotifyDataStore.getRecentlyPlayedTracks(); // make sure the data has loaded
+  console.log(recentlyPlayedTracks.value); // log the data to the console
 })
 </script>
 
 
 <template>
-    <div v-if="topTracks">
-        <SongCard v-for="song in topTracks.items" :key="song.id" :cardProp="song" />
-    </div>
+    <div v-if="recentlyPlayedTracks && recentlyPlayedTracks.items" class="song-cards-container">
+    <h2>Your Top Songs:</h2>
+    <SearchSongCard
+      v-for="song in recentlyPlayedTracks.items"
+      :key="song.track.id"
+      :cardProp="song.track"
+      cardType="song"
+    />
+  </div>
 </template>

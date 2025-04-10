@@ -13,7 +13,6 @@ const { topTracks, topArtists } = storeToRefs(spotifyDataStore);
 onMounted(async () => {
   await spotifyDataStore.getTopTracks(50, 'long_term'); // make sure the data has loaded
   await spotifyDataStore.getTopArtists(50, 'long_term'); // make sure the data has loaded
-  console.log(topArtists.value);
 })
 
 </script>
@@ -31,7 +30,7 @@ onMounted(async () => {
           />
     </div>
     <div v-if="topArtists" class="album-cards-container">
-        <h2>Your Top Albums:</h2>
+        <h2>Your Top Artists:</h2>
         <SearchArtistCard
           v-for="album in topArtists.items"
           :key="album.id"

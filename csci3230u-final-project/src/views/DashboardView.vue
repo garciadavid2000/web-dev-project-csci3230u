@@ -13,19 +13,6 @@
             cardType="song"
           />
         </div>
-        
-        <ul>
-          <li v-for="song in topSongs" :key="song.id">{{ song.name }}, by {{ song.artist }}</li>
-        </ul>
-        <h2>Total Listening Time: {{ totalListeningTime }} minutes</h2>
-        <h2>Your Top 5 Artists:</h2>
-        <ul>
-          <li v-for="artist in topArtists" :key="artist">{{ artist }}</li>
-        </ul>
-        <h2>Recently Played Tracks:</h2>
-        <ul>
-          <li v-for="song in recentlyPlayed" :key="song.id">{{ song.name }}, by {{ song.artist }}</li>
-        </ul>
         <button @click="logout">Logout</button>
       </div>
       <div id="chartContainer">
@@ -58,18 +45,6 @@ import SpotifyDataService from '@/services/SpotifyDataService.js';
 export default {
   name: 'DashboardView',
   // Register the component here:
-  components: {
-    SearchSongCard,
-  },
-  data() {
-    return {
-      user: {},
-      topSongs: [],
-      topArtists: [],
-      recentlyPlayed: [],
-      totalListeningTime: 0,  // Use a number since this is minutes
-    }
-  },
   async mounted() {
   try {
     // Fetch user data using service method
@@ -79,7 +54,6 @@ export default {
     // Fetch top tracks (limit = 5, time_range = 'short_term') using service method
     const topTracksResponse = await SpotifyDataService.getTopTracksEndpoint(5, 'short_term')
     this.topSongs = topTracksResponse.data.tracks
-    console.log('Top Songs:', this.topSongs[0].images)
     this.totalListeningTime = topTracksResponse.data.totalListeningTimeMinutes
 
     // Fetch top artists (limit = 5, time_range = 'short_term') using service method

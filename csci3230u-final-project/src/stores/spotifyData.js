@@ -46,6 +46,7 @@ export const useSpotifyDataStore = defineStore('spotifyData', () => {
       try {
         const response = await SpotifyDataService.getRecentlyPlayedTracksEndpoint();
         recentlyPlayedTracks.value = response.data;
+        console.log("Recently Played Tracks:", recentlyPlayedTracks.value.items);
       } catch (error) {
         console.error("Error fetching recently played tracks:", error);
       } finally {

@@ -124,18 +124,10 @@ app.get("/api/recently-played", async (req, res) => {
         headers: { Authorization: `Bearer ${req.session.access_token}` },
       }
     );
-
-    // console.log(response.data.items);
-    const tracks = response.data.items.map((track) => ({
-      name: track.track.name,
-      album: track.track.album.name,
-      artist: track.track.artists.map((artist) => artist.name).join(", "),
-      artistsArr: track.track.artists,
-      image: track.track.album.images[0]?.url,
-    }));
-    res.json(tracks);
+    res.json(response.data);
   } catch (error) {
-    res.send("Error fetching recently played tracks");
+    console.error("Error fetching recently played tracks:", error.response ? error.response.data : error);
+    res.status(500).send("Error fetching recently played tracks");
   }
 });
 app.get("/api/user", async (req, res) => {
