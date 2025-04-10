@@ -14,12 +14,14 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0',  // Ensures Vite is accessible inside Docker
+    port: 5173,       // Explicitly set the port
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://backend:3000',  // Use backend service name in Docker
         changeOrigin: true,
         secure: false,
       },
     },
   },
-})
+});

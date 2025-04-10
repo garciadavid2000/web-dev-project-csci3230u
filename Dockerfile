@@ -1,24 +1,32 @@
-#using node
-FROM node:18.20.8-slim AS build-stage
+# Stage 1: Build the frontend
+FROM node:23.11.0-slim AS build-stage
 
-#working dir..
 WORKDIR /app
 
-#copy only frontend (joining backend later..?)
+# Copy package.json and package-lock.json from the csci3230u-final-project folder
 COPY csci3230u-final-project/package*.json ./
+
+# Install dependencies
 RUN npm install
 
-#copy other frontend files
-COPY csci3230u-final-project/ .
+# Copy the rest of the files from the csci3230u-final-project folder
+COPY csci3230u-final-project/ ./
 
-RUN npm run build
+# Build the frontend using Vite
+# RUN npm build
+# Stage 2: Serve the built frontend using `serve`
+# FROM node:23.11.0-slim AS production-stage
 
-#serving with nginx
-FROM nginx:1.25.3-alpine AS production-stage
+# WORKDIR /app
 
-#copy frontend to nginx web dir
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+# Copy the built files from the previous stage
+# COPY --from=build-stage /app/dist ./dist
 
-EXPOSE 80
+# Install `serve` globally to serve static files
+# RUN npm install -g serve
 
-CMD ["nginx", "-g", "daemon off;"]
+# Expose the port for the frontend
+EXPOSE 5173
+
+# Command to run the server
+CMD ["npm", "run", "dev"]

@@ -1,10 +1,10 @@
-version: '3'
 services:
   frontend:
     build:
-      context: .
+      context: ./  # Root folder
     ports:
-      - "8080:80"
+      - "5173:5173"  # Expose frontend on port 8080
+    command: npm run dev
     depends_on:
       - backend
 
