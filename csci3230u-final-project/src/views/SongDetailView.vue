@@ -32,6 +32,7 @@ const formatDuration = (durationMs) => {
   const seconds = Math.floor((durationMs % 60000) / 1000)
   return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`
 }
+
 </script>
 
 <template>
@@ -42,6 +43,13 @@ const formatDuration = (durationMs) => {
           <img :src="track?.album?.images[0]?.url" alt="Track Cover" class="track-image" />
           <h2 class="track-name">{{ track?.name }}</h2>
           <p class="track-meta">Duration: {{ formatDuration(track?.duration_ms) }}</p>
+        </div>
+        <!-- Popularity Bar -->
+        <div class="popularity-bar-container">
+          <span class="flame">🔥 Popularity Score: {{ track?.popularity }}%</span>
+          <div class="popularity-bar">
+            <div class="popularity-fill" :style="{ width: track?.popularity + '%' }"></div>
+          </div>
         </div>
         <div class="album-section" v-if="track && track.album">
           <SearchSongCard :cardProp="track.album" cardType="album" />
@@ -67,15 +75,17 @@ const formatDuration = (durationMs) => {
   max-width: 900px;
   margin: 30px auto;
   padding: 20px;
+  height: auto;
 }
 
 .detail-card {
   display: flex;
   gap: 20px;
-  background-color: #2d2d2d;
+  background-color: #252525;
   border-radius: 12px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  height: auto;
 }
 .main-column {
   flex: 2;
@@ -139,5 +149,33 @@ const formatDuration = (durationMs) => {
   flex-direction: column;
   gap: 10px;
   width: 100%;
+}
+
+.popularity-container {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  gap: 6px;
+}
+
+.flame {
+  font-size: 20px;
+  color: #c0c0c0;
+  font-weight: bold;
+  min-width: 100px;
+}
+
+.popularity-bar {
+  flex-grow: 1;
+  height: 8px;
+  background-color: #7777776c;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.popularity-fill {
+  height: 100%;
+  background-color: #FF5733;
+  transition: width 0.3s ease;
 }
 </style>

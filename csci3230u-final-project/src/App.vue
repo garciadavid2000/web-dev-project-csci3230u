@@ -2,68 +2,62 @@
 import { RouterLink, RouterView } from "vue-router";
 import $ from "jquery";
 import { onMounted } from "vue";
-import { useUserDataStore } from "./stores/userData";
+import { useUserDataStore } from "@/stores/userData";
+import IconRecordPlayer from "@/components/icons/IconRecordPlayer.vue";
+
+import { storeToRefs } from "pinia";
 
 const userDataStore = useUserDataStore();
-import { storeToRefs } from "pinia";
 const { userData } = storeToRefs(userDataStore);
 
 onMounted(() => {
-  // Check for click events on the navbar burger icon
   $(".navbar-burger").click(function () {
-    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
     $(".navbar-burger").toggleClass("is-active");
     $(".navbar-menu").toggleClass("is-active");
   });
 });
-
 </script>
 
 <template>
   <header>
-    <!-- <nav>
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/dashboard">Dashboard</RouterLink>
-      <RouterLink to="/top-songs">Top Songs</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
-      <RouterLink to="/browse">Search</RouterLink>
-    </nav> -->
-    <nav class="navbar is-dark mb-4" role="navigation" aria-label="main navigation">
-      <!-- navbar-brand -->
-      <div class="navbar-brand">
-        <RouterLink to="/">
-          <a class="navbar-item">
-            <!-- made the logo wide and funny looking on purpose because thats how it looked in the lab picures -->
-            <!-- replace the uncommented line with the commented line to have the logo sized evenly -->
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVIHOyzHbOhpoMDZegU6QFAEW05jUtfHwYkQ&s"
-              width="60" height="70" alt="Sudoku Logo" />
-            <!-- <img src="images/logo.gif" alt="Sudoku Logo" /> -->
+    <nav class="navbar py-3 is-black is-sticky" role="navigation" aria-label="main navigation">
+      <div class="container is-fluid">
+        <div class="navbar-brand">
+          <RouterLink to="/">
+            <a class="navbar-item">
+              <IconRecordPlayer />
+            </a>
+          </RouterLink>
+          <RouterLink to="/" class="navbar-item">🎼Spotify Personalized🎵</RouterLink>
+          <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
           </a>
-        </RouterLink>
-
-        <RouterLink to="/dashboard" class="navbar-item">Epic And Cool Spotify App</RouterLink>
-
-        <!-- Burger item -->
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-          <!-- needed 4 spans otherwise it would only show 2 lines for some reason -->
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
-      </div>
-
-      <!-- navbar-menu -->
-      <div id="navbarBasicExample" class="navbar-menu">
-        <!-- nav-Start -->
-        <div v-if="userData" class="navbar-start">
-          <!-- Items -->
-          <RouterLink to="/dashboard" class="navbar-item">Dashboard</RouterLink>
-          <RouterLink to="/top-songs" class="navbar-item">Top Songs</RouterLink>
-          <RouterLink to="/about" class="navbar-item">About</RouterLink>
-          <RouterLink to="/browse" class="navbar-item">Search</RouterLink>
         </div>
 
+        <div id="navbarBasicExample" class="navbar-menu">
+          <div class="navbar-start">
+            <RouterLink to="/dashboard" class="navbar-item">Dashboard</RouterLink>
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">Your Favourites</a>
+              <div class="navbar-dropdown">
+                <RouterLink to="/hof" class="navbar-item">Hall of Fame</RouterLink>
+                <hr class="navbar-divider">
+                <RouterLink to="/rp" class="navbar-item">Recently Played</RouterLink>
+              </div>
+            </div>
+            <RouterLink to="/tunerank" class="navbar-item">TasteRank</RouterLink>
+            <RouterLink to="/browse" class="navbar-item">Search</RouterLink>
+          </div>
+
+          <!-- Place the About link in the navbar-end section -->
+          <div class="navbar-end">
+            <RouterLink to="/about" class="navbar-item">About</RouterLink>
+            <!-- Optionally, you can add other right-side items here -->
+          </div>
+        </div>
       </div>
     </nav>
   </header>
@@ -72,6 +66,44 @@ onMounted(() => {
   </div>
 </template>
 
+<!-- Scoped style with global selectors -->
 <style scoped>
+/* Use :global to apply background styles outside this component */
+:global(html), :global(body) {
+  margin-bottom: 10px;
+  padding: 0;
+  height: 100%;
+  background: url("@/assets/bg.png") no-repeat center center fixed;
+  filter: blur();
+  background-size: cover;
+  font-family: 'Libre Baskerville', Baskerville, serif;
+}
 
+/* Ensure content area fills the viewport */
+#content {
+  min-height: 100vh;
+}
+
+.navbar.is-black {
+  background-color: #1c1c1c !important;
+}
+
+.navbar {
+  border-radius: 5px;
+  padding-bottom: 10px;
+}
+
+.navbar-item:hover {
+  background-color: #ffa500; 
+  border-radius: 5%;           
+  padding: 0.5rem;              
+}
+
+.navbar.is-s {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000; /* Ensure it stays above other elements */
+}
+/* Other component-specific styles can go here */
 </style>

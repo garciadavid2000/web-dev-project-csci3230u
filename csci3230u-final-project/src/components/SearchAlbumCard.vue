@@ -22,7 +22,6 @@ const goToDetail = () => {
 <template>
   <div class="card" @click="goToDetail">
     <div class="album-art">
-      <!-- Use the first image from the album's images array -->
       <img :src="cardProp.images[0].url" alt="Album Cover" />
     </div>
 
@@ -40,7 +39,8 @@ const goToDetail = () => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 120px;
+  height: auto;
+  min-height: 120px;
   margin: 12px;
   background-color: #2d2d2d;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

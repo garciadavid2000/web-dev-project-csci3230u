@@ -28,7 +28,7 @@ onMounted(async () => {//Had to comment this because it kept getting too complic
     recentAlbums.value = albumsResponse.data.items.sort((a, b) => {
       // Compare release_date strings; adjust parsing as needed if precision is not 'day'
       return new Date(b.release_date) - new Date(a.release_date)
-    }).slice(0, 5)
+    }).slice(0, 3)
   } catch (error) {
     console.error("Error loading artist details, top tracks, or recent albums:", error)
   }
@@ -80,7 +80,7 @@ onMounted(async () => {//Had to comment this because it kept getting too complic
 }
 
 .detail-card {
-  background-color: #2d2d2d;
+  background-color: #252525;
   border-radius: 12px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   overflow: hidden;
