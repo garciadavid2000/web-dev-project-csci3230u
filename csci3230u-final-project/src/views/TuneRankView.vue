@@ -157,11 +157,10 @@ const fetchDataAndScore = async () => {
         </button>
 
         <div v-if="undergroundScore !== null" class="score-display">
-            <p>Your Underground Music Taste Score:</p>
-            <h2>{{ undergroundScore }} / 100</h2>
+            <p> Your Underground Music Taste Score:</p>
+            <h2>🌌 {{ undergroundScore }} / 100 🌌</h2>
         </div>
         <div v-if="undergroundScore !== null" class="popularity-bar-container">
-          <span class="flame">🚪 Underground Score : {{ undergroundScore }} %</span>
           <div class="popularity-bar">
             <div class="popularity-fill" :style="{ width: undergroundScore + '%' }"></div>
           </div>
@@ -186,7 +185,7 @@ const fetchDataAndScore = async () => {
 
 h1 {
   font-size: 2.5rem;
-  color: #ffa500;
+  color: #2b75ff;
   margin-bottom: 1rem;
 }
 
@@ -230,7 +229,7 @@ select:hover {
 }
 
 .rank-btn {
-  background-color: #ffa500;
+  background-color: #85e2d5;
   border: none;
   padding: 0.8rem 2rem;
   font-size: 1.2rem;
@@ -243,7 +242,7 @@ select:hover {
 }
 
 .rank-btn:hover {
-  background-color: #ff8c00;
+  background-color: #3460ab;
 }
 
 .score-display {
@@ -252,7 +251,7 @@ select:hover {
 
 .score-display h2 {
   font-size: 3rem;
-  color: #ffa500;
+  color: #59d6f1;
 }
 
 .hook {
@@ -277,15 +276,16 @@ select:hover {
 
 .popularity-bar {
   flex-grow: 1;
-  height: 8px;
+  height: 15px;
   background-color: #7777776c;
-  border-radius: 4px;
+  border-radius: 15px;
   overflow: hidden;
+  margin-top: 12px;
 }
 
 .popularity-fill {
   height: 100%;
-  background-color: #FF5733;
+  background-color: #bcf2ff;
   transition: width 0.3s ease;
 }
 
