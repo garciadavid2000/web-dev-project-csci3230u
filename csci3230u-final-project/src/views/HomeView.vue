@@ -12,7 +12,7 @@ function handleLogin() {
       <div class="container has-text-centered">
         <div class="column is-half is-offset-one-quarter">
           <h1 class="title">🎶 Welcome To our Spotify Wrapper Project!</h1>
-          <p class="subtitle mt-5">🎹 This is a simple test of the Spotify API</p>
+          <p class="subtitle mt-5">🎹 This is a professional application that utilizes the Spotify API. 😈</p>
           <p class="subtitle">Click the button below to log in with your Spotify account and start using the app.</p>
           <p class="title mt-5">👇</p>
             <LoginButton @click="handleLogin" />

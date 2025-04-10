@@ -64,7 +64,7 @@ app.get("/api/callback", async (req, res) => {
     req.session.access_token = response.data.access_token;
     // console.log(response.data)
     req.session.refresh_token = response.data.refresh_token;
-    res.redirect("http://localhost:5173/dashboard");
+    res.redirect("http://localhost:5173/hof");
   } catch (error) {
     console.error(
       "Error getting tokens:",
