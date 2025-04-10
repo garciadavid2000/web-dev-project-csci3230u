@@ -64,9 +64,9 @@ onMounted(() => {
             </a>
 
             <div class="navbar-dropdown">
-              <RouterLink to="/top-songs" class="navbar-item">Top Songs</RouterLink>
-              <RouterLink to="/top-artists" class="navbar-item">Top Artists</RouterLink>
-              <RouterLink to="/top-albums" class="navbar-item">Top Albums</RouterLink>
+              <RouterLink to="/hof" class="navbar-item">Top Songs</RouterLink>
+              <hr class="navbar-divider">
+              <RouterLink to="/rp" class="navbar-item">Recently Played</RouterLink>
             </div>
           </div>
           <RouterLink to="/about" class="navbar-item">About</RouterLink>
