@@ -16,16 +16,7 @@ onMounted(async () => {
 
 
 <template>
-    <div v-if="recentlyPlayedTracks && recentlyPlayedTracks.items" class="song-cards-container">
-    <h2 class="header">Your Recent Played Tracks:</h2>
-    <SearchSongCard
-      v-for="song in recentlyPlayedTracks.items"
-      :key="song.track.id"
-      :cardProp="song.track"
-      cardType="song"
-    />
-  </div>
-</template>
+    <div v-if="recentlyPlayedTracks && recentlyPlayedTracks.items" class="song-container">
       <h2 class="header">Your Recently Played Songs:</h2>
       <SearchSongCard
         v-for="song in recentlyPlayedTracks.items"
@@ -42,8 +33,12 @@ onMounted(async () => {
   margin-left: 10px;
 }
 
-.song-cards-container {
-  margin-right: 40px;
+.song-container {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 360px;
 }
+
 
 </style>
