@@ -32,56 +32,6 @@ const calculateUndergroundScore = (tracks, artists) => {
   return Math.round(100 - avgPopularity)
 }
 
-watch(lowestTrack, async (newTrack) => {
-  if (newTrack?.trackId) {
-    const trackRes = await axios.get(`/api/track/${newTrack.trackId}`)
-    lowestTrackData.value = trackRes.data
-  }
-})
-
-watch(lowestArtist, async (newArtist) => {
-  if (newArtist?.artistId) {
-    const artistRes = await axios.get(`/api/artist/${newArtist.artistId}`)
-    lowestArtistData.value = artistRes.data
-  }
-})
-
-async function getArtistIdByName(artistName) {
-    try {
-        const response = await SpotifyDataService.searchTracksEndpoint(artistName, 'artist');
-
-        const artistId = response.data.artists.items[0]?.id;
-
-        if (artistId) {
-            console.log(`Artist ID for ${artistName}: ${artistId}`);
-            return artistId;
-        } else {
-            console.log(`No artist found for name: ${artistName}`);
-        }
-
-    } catch (error) {
-        console.error("Error fetching artist:", error);
-    }
-}
-
-async function getTrackIdByName(trackName, artistName, albumName) {
-    try {
-        const response = await SpotifyDataService.searchTracksEndpoint(trackName+' '+artistName+' '+albumName, 'track');
-
-        const trackId = response.data.tracks.items[0]?.id;
-
-        if (trackId) {
-            console.log(`Track ID for ${trackName}: ${trackId}`);
-            return trackId;
-        } else {
-            console.log(`No track found for name: ${trackName}`);
-        }
-        
-    } catch (error) {
-        console.error("Error fetching track:", error);
-    }
-}
-
 const fetchDataAndScore = async () => {
   loading.value = true
   trackPopularityList.length = 0;
@@ -93,55 +43,38 @@ const fetchDataAndScore = async () => {
       SpotifyDataService.getTopArtistsEndpoint(depth.value, timeRange.value)
     ])
 
-    for (const track of tracksRes.data.tracks) {
-        try {
-            // Need to manually search for track id (very consistent when using artist name, track name and album name)
-            const trackId = await getTrackIdByName(track.name, track.artistsArr[0].name, track.album);
+    console.log(tracksRes, artistsRes)
 
-            const trackDetails = await SpotifyDataService.getTrackById(trackId);
+    const tracks = tracksRes.data.items
+    const artists = artistsRes.data.items
 
-            //Store all relevant information in array
-            trackPopularityList.push({
-                trackId: trackId,
-                popularity: trackDetails.data.popularity,
-                name: track.name,
-                artist: track.artistsArr[0].name
-            });
-
-            console.log(`Track: ${track.name}, Popularity: ${trackDetails.data.popularity}`);
-        } catch (error) {
-            console.error(`Error fetching popularity for track: ${track.name}`, error);
-        }
+    // Directly use the data returned
+    for (const track of tracks) {
+      trackPopularityList.push({
+        trackId: track.id,
+        popularity: track.popularity,
+        name: track.name,
+        artist: track.artists[0]?.name || 'Unknown'
+      })
     }
 
-    for (const artist of artistsRes.data) {
-        try {
-            // Need to manually search for artist id
-            const artistId = await getArtistIdByName(artist.name);
-
-            const artistDetails = await SpotifyDataService.getArtistById(artistId);
-            console.log(artistDetails)
-
-            //Store all relevant information in array
-            artistPopularityList.push({
-                artistId: artistId,
-                popularity: artistDetails.data.popularity,
-                name: artist.name
-            });
-
-            console.log(`Artist: ${artist.name}, Popularity: ${artistDetails.data.popularity}`);
-        } catch (error) {
-            console.error(`Error fetching popularity for artist: ${artist.name}`, error);
-        }
+    for (const artist of artists) {
+      artistPopularityList.push({
+        artistId: artist.id,
+        popularity: artist.popularity,
+        name: artist.name
+      })
     }
-
-    console.log(trackPopularityList)
-    console.log(artistPopularityList)
 
     lowestTrack.value = trackPopularityList.reduce((min, track) => track.popularity < min.popularity ? track : min, trackPopularityList[0]);
     lowestArtist.value = artistPopularityList.reduce((min, artist) => artist.popularity < min.popularity ? artist : min, artistPopularityList[0]);
 
-    console.log(lowestTrack)
+    const [lowestTrackRes, lowestArtistRes] = await Promise.all([
+      SpotifyDataService.getTrackById(lowestTrack.value.trackId),
+      SpotifyDataService.getArtistById(lowestArtist.value.artistId)
+    ])
+
+    console.log(lowestTrackRes.data.id)
 
     undergroundScore.value = calculateUndergroundScore(trackPopularityList, artistPopularityList)
   } catch (error) {
@@ -197,27 +130,19 @@ const fetchDataAndScore = async () => {
             <h2> ⚙️ Loading ⚙️ </h2>
         </div>
     </div>
-    <div class="album-section" v-if="undergroundScore !== null && lowestTrack?.trackId">
+    <!-- <div v-if="undergroundScore !== null && lowestTrackRes && lowestTrackRes.data && lowestTrackRes.data.id">
         <SearchSongCard
-            :cardProp="{
-            id: lowestTrack.trackId,
-            name: lowestTrack.name,
-            artist: lowestTrack.artist,
-            popularity: lowestTrack.popularity
-            }"
-            cardType="track"
+            :key="lowestTrackRes.data.id"
+            :cardProp="lowestTrack"
+            cardType="song"
         />
     </div>
     <div class="album-section" v-if="undergroundScore !== null && lowestArtist?.artistId">
         <SearchArtistCard
-            :cardProp="{
-            id: lowestArtist.artistId,
-            name: lowestArtist.name,
-            popularity: lowestArtist.popularity
-            }"
+            :cardProp="lowestArtist"
             cardType="artist"
         />
-    </div>
+    </div> -->
 </template>
   
 <style scoped>
