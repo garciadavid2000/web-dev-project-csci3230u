@@ -7,12 +7,13 @@ export const useSpotifyDataStore = defineStore('spotifyData', () => {
   const topArtists = ref(null);
   const recentlyPlayedTracks = ref(null);
   const isLoading = ref(false);
+  const time_range_prev = ref([null,null]); //0 = TOP TRACKS, 1 = TOP ARTISTS
 
   // example of computed property if necessary
   // const doubleCount = computed(() => count.value * 2) 
   
   async function getTopTracks(limit = 5, time_range = 'short_term') {
-    if (topTracks.value === null || topTracks.value.length !== limit) {
+    if (topTracks.value === null || topTracks.value.length !== limit || time_range_prev[0].value !== time_range || time_range_prev[0].value === null) {
       isLoading.value = true;
       try {
         const response = await SpotifyDataService.getTopTracksEndpoint(limit, time_range);

@@ -75,33 +75,21 @@ app.get("/api/callback", async (req, res) => {
 });
 
 app.get("/api/top-tracks", async (req, res) => {
-  if (!req.session.access_token)
+  if (!req.session.access_token) {
     return res.status(401).json({ message: "Not authenticated" });
-  const { limit = 5, time_range = "medium_term" } = req.query; //default values if not specified
-  // NOTE: acceptable time_ranges for the API are: long_term (About a year), medium_term (6 months) and short_term(1 month)
+  }
+  
+  const { limit = 5, time_range = "medium_term" } = req.query; // default values if not specified
+  
   try {
     const response = await axios.get(`${SPOTIFY_API_URL}/me/top/tracks`, {
       headers: { Authorization: `Bearer ${req.session.access_token}` },
       params: { limit, time_range },
     });
-
-    // console.log(response.data.items)
-    const tracks = response.data.items.map((track) => ({
-      name: track.name,
-      album: track.album.name,
-      artist: track.artists.map((artist) => artist.name).join(", "),
-      artistsArr: track.artists,
-      image: track.album.images[0]?.url,
-      duration_ms: track.duration_ms,
-    }));
-    const totalListeningTimeMs = tracks.reduce(
-      (sum, track) => sum + track.duration_ms,
-      0
-    ); // total time played
-    const totalListeningTimeMinutes = (totalListeningTimeMs / 60000).toFixed(2);
-    res.json({ tracks, totalListeningTimeMinutes });
+    res.json(response.data);
   } catch (error) {
-    res.send("Error fetching top tracks");
+    console.error("Error fetching top tracks:", error.response ? error.response.data : error);
+    res.status(500).send("Error fetching top tracks");
   }
 });
 
@@ -109,25 +97,21 @@ app.get("/api/top-tracks", async (req, res) => {
 app.get("/api/top-artists", async (req, res) => {
   if (!req.session.access_token)
     return res.status(401).json({ message: "Not authenticated" });
-  const { limit = 5, time_range = "medium_term" } = req.query; //default values if not specified
-
+    
+  const { limit = 5, time_range = "medium_term" } = req.query; // default values if not specified
+  
   try {
     const response = await axios.get(`${SPOTIFY_API_URL}/me/top/artists`, {
       headers: { Authorization: `Bearer ${req.session.access_token}` },
       params: { limit, time_range },
     });
-
-    const artists = response.data.items.map((artist) => ({
-      name: artist.name,
-      genres: artist.genres.join(", "),
-      image: artist.images[0]?.url,
-    }));
-
-    res.json(artists);
+    res.json(response.data); // return the full response
   } catch (error) {
-    res.send("Error fetching top artists");
+    console.error("Error fetching top artists:", error.response ? error.response.data : error);
+    res.status(500).send("Error fetching top artists");
   }
 });
+
 
 app.get("/api/recently-played", async (req, res) => {
   if (!req.session.access_token)

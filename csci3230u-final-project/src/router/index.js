@@ -2,11 +2,12 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useUserDataStore } from '@/stores/userData.js'
 import HomeView from '../views/HomeView.vue'
 import DashboardView from '@/views/DashboardView.vue'
-import TopSongsView from '@/views/TopSongsView.vue'
 import BrowseView from '@/views/BrowseView.vue';
 import SongDetailView from '@/views/SongDetailView.vue';
 import ArtistDetailView from '@/views/ArtistDetailView.vue';
 import AlbumDetailView from '@/views/AlbumDetailView.vue';
+import HallOfFameView from '@/views/HallOfFameView.vue'
+import RecentlyPlayedView from '@/views/RecentlyPlayedView.vue';
 
 
 const router = createRouter({
@@ -31,22 +32,16 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/top-songs',
-      name: 'top-songs',
-      component: TopSongsView,
+      path: '/hof',
+      name: 'hall-of-fame',
+      component: HallOfFameView,
       meta: { requiresAuth: true },
     },
     // TODO: Add top artists and top albums routes
     {
-      path: '/top-artists',
-      name: 'top-songs',
-      component: TopSongsView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/top-albums',
-      name: 'top-songs',
-      component: TopSongsView,
+      path: '/rp',
+      name: 'recently-played',
+      component: RecentlyPlayedView,
       meta: { requiresAuth: true },
     },
     { 

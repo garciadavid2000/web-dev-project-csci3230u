@@ -4,8 +4,18 @@
     <div id="dashboard">
       <div id="userInfo">
         <h2>Your Top 5 Songs:</h2>
+        <div v-if="topSongs" class="song-cards-container">
+          <h2>Your Top Songs:</h2>
+          <SearchSongCard
+            v-for="song in topSongs"
+            :key="song.track_id"
+            :cardProp="song"
+            cardType="song"
+          />
+        </div>
+        
         <ul>
-          <li v-for="song in topSongs" :key="song">{{ song.name }}, by {{ song.artist }}</li>
+          <li v-for="song in topSongs" :key="song.id">{{ song.name }}, by {{ song.artist }}</li>
         </ul>
         <h2>Total Listening Time: {{ totalListeningTime }} minutes</h2>
         <h2>Your Top 5 Artists:</h2>
@@ -14,7 +24,7 @@
         </ul>
         <h2>Recently Played Tracks:</h2>
         <ul>
-          <li v-for="song in recentlyPlayed" :key="song">{{ song.name }}, by {{ song.artist }}</li>
+          <li v-for="song in recentlyPlayed" :key="song.id">{{ song.name }}, by {{ song.artist }}</li>
         </ul>
         <button @click="logout">Logout</button>
       </div>
@@ -42,135 +52,79 @@
 import axios from 'axios'
 import $ from 'jquery'
 import * as d3 from 'd3'
+import SearchSongCard from '@/components/SearchSongCard.vue';
+import SpotifyDataService from '@/services/SpotifyDataService.js';
 
 export default {
+  name: 'DashboardView',
+  // Register the component here:
+  components: {
+    SearchSongCard,
+  },
   data() {
     return {
       user: {},
       topSongs: [],
       topArtists: [],
       recentlyPlayed: [],
-      totalListeningTime: [],
+      totalListeningTime: 0,  // Use a number since this is minutes
     }
   },
   async mounted() {
-    try {
-      const userResponse = await axios.get('/api/user', { withCredentials: true })
-      this.user = userResponse.data
-      const topTracksResponse = await axios.get('/api/top-tracks', { withCredentials: true })
-      this.topSongs = topTracksResponse.data.tracks
-      this.totalListeningTime = topTracksResponse.data.totalListeningTimeMinutes
-      const topArtistsResponse = await axios.get('/api/top-artists', { withCredentials: true })
-      this.topArtists = topArtistsResponse.data
-      const recentlyPlayedResponse = await axios.get('/api/recently-played', {
-        withCredentials: true,
-      })
-      this.recentlyPlayed = recentlyPlayedResponse.data
+  try {
+    // Fetch user data using service method
+    const userResponse = await SpotifyDataService.getUserEndpoint()
+    this.user = userResponse.data
 
-      const recentArtistIds = Array.from(
-        new Set(this.recentlyPlayed.map((track) => track.artistsArr.map((artist) => artist.id))),
-      )
-      // Get full artist data
-      const recentArtistsArr = (
-        await axios.get('/api/artists', {
-          withCredentials: true,
-          params: {
-            ids: recentArtistIds.join(','),
-          },
-        })
-      ).data
-      const recentArtistsMap = {}
-      recentArtistsArr.forEach((artist) => {
-        recentArtistsMap[artist.id] = artist
-      })
-      // Map the artist data to the tracks
-      this.recentlyPlayed = this.recentlyPlayed.map((track) => {
-        track.artistsArr = track.artistsArr.map((artist) => {
-          const fullArtist = recentArtistsMap[artist.id]
-          return {
-            ...artist,
-            genres: fullArtist ? fullArtist.genres : [],
-          }
-        })
-        return track
-      })
+    // Fetch top tracks (limit = 5, time_range = 'short_term') using service method
+    const topTracksResponse = await SpotifyDataService.getTopTracksEndpoint(5, 'short_term')
+    this.topSongs = topTracksResponse.data.tracks
+    console.log('Top Songs:', this.topSongs[0].images)
+    this.totalListeningTime = topTracksResponse.data.totalListeningTimeMinutes
 
-      // get full authors for top songs
-      const topArtistIds = Array.from(
-        new Set(this.topSongs.map((track) => track.artistsArr.map((artist) => artist.id))),
-      )
+    // Fetch top artists (limit = 5, time_range = 'short_term') using service method
+    const topArtistsResponse = await SpotifyDataService.getTopArtistsEndpoint(5, 'short_term')
+    this.topArtists = topArtistsResponse.data
 
-      // Get full artist data
-      const topArtistsArr = (
-        await axios.get('/api/artists', {
-          withCredentials: true,
-          params: {
-            ids: topArtistIds.join(','),
-          },
-        })
-      ).data
+    // Fetch recently played tracks using service method
+    const recentlyPlayedResponse = await SpotifyDataService.getRecentlyPlayedTracksEndpoint()
+    this.recentlyPlayed = recentlyPlayedResponse.data
 
-      const topArtistsMap = {}
-      topArtistsArr.forEach((artist) => {
-        topArtistsMap[artist.id] = artist
-      })
+    
+    // --- Chart Buttons & Rendering (Legacy jQuery-based logic) ---
+    let dataSource = 'recent'
+    let dataType = 'albums'
+    const vm = this // preserve component context
 
-      // Map the artist data to the tracks
-      this.topSongs = this.topSongs.map((track) => {
-        track.artistsArr = track.artistsArr.map((artist) => {
-          const fullArtist = topArtistsMap[artist.id]
-          return {
-            ...artist,
-            genres: fullArtist ? fullArtist.genres : [],
-          }
-        })
-        return track
-      })
-
-      let dataSource = 'recent'
-      let dataType = 'albums'
-      const vm = this // keep track of component context
-
-      $('.sourceButton').click(function () {
-        // Do nothing if already active
-        if ($(this).hasClass('active')) {
-          return
-        }
-        $('.sourceButton').removeClass('active')
-        $(this).addClass('active')
-        // Assign data based on the button clicked
-        if ($(this).text() === 'Recent') {
-          dataSource = 'recent'
-        } else if ($(this).text() === 'Top') {
-          dataSource = 'top'
-        }
-        const data = vm.getChartData(dataSource, dataType)
-        vm.updateChart(data)
-      })
-      $('.chartButton').click(function () {
-        // Do nothing if already active
-        if ($(this).hasClass('active')) {
-          return
-        }
-        $('.chartButton').removeClass('active')
-        $(this).addClass('active')
-        // Assign data based on the button clicked
-        if ($(this).text() === 'Albums') {
-          dataType = 'albums'
-        } else if ($(this).text() === 'Artists') {
-          dataType = 'artists'
-        } else if ($(this).text() === 'Genres') {
-          dataType = 'genres'
-        }
-        const data = vm.getChartData(dataSource, dataType)
-        vm.updateChart(data)
-      })
-      const chartData = this.getChartData(dataSource, dataType)
-      this.updateChart(chartData)
-    } catch (error) {
-      console.error('Error fetching data:', error)
-    }
-  },
+    $('.sourceButton').click(function () {
+      if ($(this).hasClass('active')) return
+      $('.sourceButton').removeClass('active')
+      $(this).addClass('active')
+      dataSource = $(this).text() === 'Recent' ? 'recent' : 'top'
+      const data = vm.getChartData(dataSource, dataType)
+      vm.updateChart(data)
+    })
+    $('.chartButton').click(function () {
+      if ($(this).hasClass('active')) return
+      $('.chartButton').removeClass('active')
+      $(this).addClass('active')
+      if ($(this).text() === 'Albums') {
+        dataType = 'albums'
+      } else if ($(this).text() === 'Artists') {
+        dataType = 'artists'
+      } else if ($(this).text() === 'Genres') {
+        dataType = 'genres'
+      }
+      const data = vm.getChartData(dataSource, dataType)
+      vm.updateChart(data)
+    })
+    const chartData = this.getChartData(dataSource, dataType)
+    this.updateChart(chartData)
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  }
+}
+,
   methods: {
     logout() {
       window.location.href = '/api/logout'
@@ -180,10 +134,10 @@ export default {
       if (type === 'albums') {
         let albums = {}
         data.forEach((track) => {
-          // Increment or assign 1
-          albums[track.album] = (albums[track.album] || 0) + 1
+          // Use track.album.name if available (adjust to your data structure)
+          const albumName = track.album?.name || track.album
+          albums[albumName] = (albums[albumName] || 0) + 1
         })
-        // Convert to array of objects
         let albumData = []
         for (const [key, value] of Object.entries(albums)) {
           albumData.push({ name: key, value: value })
@@ -192,13 +146,11 @@ export default {
       } else if (type === 'artists') {
         let artists = {}
         data.forEach((track) => {
-          // Increment or assign 1 for each artist
           track.artistsArr.forEach((artist) => {
-            artist = artist.name.trim()
-            artists[artist] = (artists[artist] || 0) + 1
+            const name = artist.name.trim()
+            artists[name] = (artists[name] || 0) + 1
           })
         })
-        // Convert to array of objects
         let artistData = []
         for (const [key, value] of Object.entries(artists)) {
           artistData.push({ name: key, value: value })
@@ -207,16 +159,13 @@ export default {
       } else if (type === 'genres') {
         let genres = {}
         data.forEach((track) => {
-          // Increment or assign 1 for each genre
           track.artistsArr.forEach((artist) => {
-            console.log(artist)
             artist.genres.forEach((genre) => {
               genre = genre.trim()
               genres[genre] = (genres[genre] || 0) + 1
             })
           })
         })
-        // Convert to array of objects
         let genreData = []
         for (const [key, value] of Object.entries(genres)) {
           genreData.push({ name: key, value: value })
@@ -235,12 +184,11 @@ export default {
         $('#chart').append('<p>No data available</p>')
         return
       }
-      // Set up the chart
       const chart = $('#chart').css('width', '100%').css('height', '400px')
       const width = 300
       const height = 300
       const svg = d3
-        .select(chart[0]) // JQuery object to DOM element
+        .select(chart[0])
         .append('svg')
         .attr('width', width)
         .attr('height', height)
@@ -266,13 +214,11 @@ export default {
         .style('stroke-width', '2px')
         .style('opacity', 0.7)
 
-      // show percentage on each slice
       const total = data.reduce((acc, d) => acc + d.value, 0)
       arcs
         .append('text')
         .text(function (d) {
           const fraction = d.data.value / total
-          // avoiding adding text to slices that are too small
           return fraction > 0.05 ? Math.round(fraction * 100) + '%' : ''
         })
         .attr('transform', function (d) {
@@ -281,7 +227,6 @@ export default {
         .style('text-anchor', 'middle')
         .style('font-size', 17)
 
-      // Add legend
       const legendRectSize = 18
       const legendSpacing = 4
       const legendEl = $('#legend')[0]
@@ -316,4 +261,5 @@ export default {
   },
 }
 </script>
+
 <style scoped src="../assets/dashboard.css"></style>
