@@ -291,13 +291,27 @@ export default {
           <button class="chartButton">Genres</button>
         </div>
       </div>
-      <div id="chartWrapper">
-        <div id="chart"></div>
-        <div id="legend"></div>
+      <div class="chartdiv" id="chartWrapper">
+        <div class="subdiv" id="chart"> </div>
+        <div class="subdiv" id="legend"></div>
       </div>
     </div>
     <!-- </div> -->
   </div>
 </template>
 
-<style scoped src="../assets/dashboard.css"></style>
+<style
+ scoped src="../assets/dashboard.css">
+</style>
+
+<style>
+
+ .chartdiv {
+  background-color: rgb(255, 255, 255);
+ }
+
+ .welcome {
+  color: rgb(47, 47, 47);
+ }
+ 
+ </style>
