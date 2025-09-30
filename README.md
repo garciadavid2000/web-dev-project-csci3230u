@@ -2,7 +2,7 @@
 ## Setup Instructions
 
 # Demo Video (contains setup instructions at the end)
-[Demo](www.youtube.com)
+[Demo](https://youtu.be/Stx6hZZpnxs)
 
 ### 1. Setting up the Spotify App
 First, make sure you have a Spotify account. Sign in to https://developer.spotify.com and click on the dashboard, and create an app. Give it any name and description you want 
